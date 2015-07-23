@@ -1,0 +1,20 @@
+namespace Crawler.Data.Migrations
+{
+    using System;
+    using System.Data.Entity.Migrations;
+    
+    public partial class Migrations : DbMigration
+    {
+        public override void Up()
+        {
+            AlterColumn("dbo.Contents", "details", c => c.String());
+            AlterColumn("dbo.Contents", "details_html", c => c.String());
+        }
+        
+        public override void Down()
+        {
+            AlterColumn("dbo.Contents", "details_html", c => c.String(nullable: false));
+            AlterColumn("dbo.Contents", "details", c => c.String(nullable: false));
+        }
+    }
+}

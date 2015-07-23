@@ -1,0 +1,57 @@
+﻿using Quartz;
+using Quartz.Impl;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Crawler.Scheduler.Jobs
+{
+    public class CrawlInstance
+    {
+        IJobDetail job;
+        IScheduler scheduler;
+
+        public CrawlInstance()
+        {
+            scheduler = StdSchedulerFactory.GetDefaultScheduler();
+        }
+
+        public void AddJob()
+        {
+            job = JobBuilder.Create<CrawlIlbe>()
+                   .WithIdentity("job1", "group1")
+                   .Build();
+
+            ITrigger trigger = TriggerBuilder.Create()
+                   .WithIdentity("trigger1", "group1")
+                   .StartNow()
+                   .WithSimpleSchedule(x => x
+                       .WithIntervalInSeconds(10)
+                       .RepeatForever())
+                   .Build();
+
+            scheduler.ScheduleJob(job, trigger);
+        }
+
+        public void Start()
+        {
+            scheduler.Start();
+        }
+
+        public void Stop()
+        {
+            scheduler.Shutdown();
+        }
+
+    }
+
+    public class CrawlIlbe : IJob
+    {
+        public void Execute(IJobExecutionContext context)
+        {
+            Console.WriteLine("Greetings from HelloJob!");
+        }
+    }
+}

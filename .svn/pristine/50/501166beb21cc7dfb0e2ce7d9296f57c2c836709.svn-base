@@ -1,0 +1,20 @@
+namespace Crawler.Data.Migrations
+{
+    using System;
+    using System.Data.Entity.Migrations;
+    
+    public partial class Migrations : DbMigration
+    {
+        public override void Up()
+        {
+            AlterColumn("dbo.Srcdatas", "originalpayload", c => c.Binary());
+            AlterColumn("dbo.Srcdatas", "processedpayload", c => c.Binary());
+        }
+        
+        public override void Down()
+        {
+            AlterColumn("dbo.Srcdatas", "processedpayload", c => c.Binary(nullable: false));
+            AlterColumn("dbo.Srcdatas", "originalpayload", c => c.Binary(nullable: false));
+        }
+    }
+}

@@ -1,0 +1,92 @@
+﻿
+<h1>2014-02-02 13:00</h1>
+
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-heading"><img src="http://img4.wikia.nocookie.net/__cb20131025161136/nuri/ko/images/1/10/%EC%9D%BC%EB%B2%A0%EB%A1%9C%EA%B3%A0.png" style="height:20px" /> 일간베스트<span class="pull-right">www.ilbe.com</span></div>
+            <div class="">
+                <table class="table table-striped table-hover table-condensed">
+                    <tbody>
+                        <tr>
+                            <td class="col-md-2">
+                                <span class="label label-success">역대급</span>
+                            </td>
+                            <td class="col-md-7">
+                                밥은먹고 다니냐.jpg
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-2">
+                                <span class="label label-success">역대급</span>
+                            </td>
+                            <td class="col-md-7">
+                                밥은먹고 다니냐.jpg
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-2">
+                                <span class="label label-success">역대급</span>
+                            </td>
+                            <td class="col-md-7">
+                                밥은먹고 다니냐.jpg
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-2">
+                                <span class="label label-success">역대급</span>
+                            </td>
+                            <td class="col-md-7">
+                                밥은먹고 다니냐.jpg
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-2">
+                                <span class="label label-success">역대급</span>
+                            </td>
+                            <td class="col-md-7">
+                                밥은먹고 다니냐.jpg
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02</small>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="panel-footer">
+                수집시간 : 13:00
+            </div>
+        </div>
+
+    </div>
+    <div class="col-md-4">
+        <div class="panel">
+            merong
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="panel">
+            merong
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="panel">
+            merong
+        </div>
+    </div>
+
+</div>

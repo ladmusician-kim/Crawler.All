@@ -1,0 +1,36 @@
+﻿using Crawler.DTO.ResponseDTO;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Crawler.DTO.RequestDTO
+{
+    public class SnapshotCreateRequestDTO
+    {
+        public SnapshotDTO Snapshot { get; set; }
+    }
+
+    public class SnapshotUpdateRequestDTO
+    {
+        public SnapshotDTO Snapshot { get; set; }
+    }
+
+    public class SnapshotGetbyIdRequestDTO
+    {
+        public int? SnapshotId { get; set; }
+    }
+
+    public class SnapshotSaveRequestDTO
+    {
+        public SnapshotDTO Snapshot { get; set; }
+        public DateTime? TimeSlot { get; set; }
+    }
+
+
+    public class SnapshotGetbyBoardIdRequestDTO
+    {
+        public int? For_BoardId { get; set; }
+    }
+}

@@ -1,0 +1,68 @@
+﻿using Crawler.Data.DbContext;
+using Crawler.DTO.RequestDTO;
+using Crawler.DTO.ResponseDTO;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Crawler.API.ServiceCode
+{
+    public partial class CrawlerService : ServiceBase
+    {
+        public EnvelopeDTO<BoardDTO> Any(BoardGetbyIdRequestDTO req)
+        {
+            var boardid = req.BoardId;
+
+            if (boardid == null)
+            {
+                return Fail<BoardDTO>("BoardGetRequestDTO : parameter 'boardid' is empty.");
+            }
+
+            using (var entities = new CrawlerStorage())
+            {
+                try
+                {
+                    var board = (from b in entities.Boards
+                                where b.Id == boardid
+                                select new BoardDTO
+                                {
+                                    Id = b.Id,
+                                    For_WebsiteId = b.For_WebsiteId,
+                                    Label = b.Label
+                                }).SingleOrDefault();
+
+                    if (board == null)
+                    {
+                        return Fail<BoardDTO>("BoardGetRequestDTO : Board matching given 'BoardId' does not exist.");
+                    }
+
+                    return Succeeded(board);
+                }
+                catch (Exception e)
+                {
+                    return Fail<BoardDTO>("BoardGetRequestDTO : Exception - " + e.Message);
+                }
+            }
+        }
+
+        public EnvelopeDTO<GenericDummyDTO> Any(BoardCreateRequestDTO req)
+        {
+            var Label = req.Label;
+            var For_WebsiteId = req.For_WebsiteId;
+
+            using (var entities = new CrawlerStorage())
+            {
+                var board = new Board();
+                board.Label = Label;
+                board.For_WebsiteId = For_WebsiteId;
+
+                entities.Boards.Add(board);
+
+                entities.SaveChanges();
+
+                return Succeeded(new GenericDummyDTO());
+            }
+        }
+    }
+}

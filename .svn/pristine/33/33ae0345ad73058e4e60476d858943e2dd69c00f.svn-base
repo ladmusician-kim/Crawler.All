@@ -1,0 +1,43 @@
+﻿using Crawler.Data.DbContext;
+using Crawler.DTO.RequestDTO;
+using Crawler.DTO.ResponseDTO;
+using ServiceStack.ServiceClient.Web;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Crawler.API.ServiceCode
+{
+    public partial class CrawlerService : ServiceBase
+    {
+        public EnvelopeDTO<SnapshotDTO> Any(SnapshotCreateRequestDTO req)
+        {
+            var taken = req.Taken;
+            var For_WebsiteId = req.For_WebsiteId;
+            var For_Timeperiod = req.For_TimeperiodId;
+
+            using (var entities = new CrawlerStorage())
+            {
+                try
+                {
+                    var snapshot = new Snapshot();
+
+                    snapshot.For_Timeperiod = For_Timeperiod;
+                    snapshot.For_WebsiteId = For_WebsiteId;
+                    snapshot.Taken = taken;
+
+                    entities.Snapshots.Add(snapshot);
+
+                    entities.SaveChanges();
+
+                    return Succeeded(new SnapshotDTO { Taken = snapshot.Taken, Id = snapshot.Id, For_WebsiteId = snapshot.For_WebsiteId, For_Timeperiod = snapshot.For_WebsiteId });
+                }
+                catch (Exception e)
+                {
+                    return Fail<SnapshotDTO>("SnapshotCreateRequestDTO : Exception - " + e.Message);
+                }
+            }
+        }
+    }
+}

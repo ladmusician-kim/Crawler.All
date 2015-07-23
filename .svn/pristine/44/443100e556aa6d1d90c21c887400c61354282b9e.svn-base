@@ -1,0 +1,204 @@
+﻿using Sitecrawler.Core.Interface;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HtmlAgilityPack;
+using Crawler.Data.DbContext;
+using System.Text.RegularExpressions;
+using Crawler.DTO.ResponseDTO;
+
+namespace Sitecrawler.Core.Code
+{
+    public class dogdripCrawler : commonCrawler
+    {
+        // Icrawler로 부터 상속받은 부분
+        public override bool Login(string Username, string Password)
+        {
+            return true;
+        }
+
+        public override void UpdateRecentArticles(int boardid)
+        {
+        }
+
+        public override void Noop()
+        {
+
+        }
+
+        public override void ParseComment()
+        {
+
+        }
+
+        public override void ParseClickNum()
+        {
+
+        }
+
+        public override void ParseLikeNum()
+        {
+
+        }
+        public override void Run()
+        {
+            
+            //commonCrawler로 부터 상속받은 부분
+            //개드립
+            var dogdrip = webGetutf.Load("http://www.dogdrip.net/dogdrip");
+            var dogdrip_timecount = 0;
+
+            //content_guid를 저장하는 List
+            List<int> contentList = new List<int>();
+
+            foreach (var dogdrip_sitename in dogdrip.DocumentNode.SelectNodes("//div[@class = 'hx h2' ]//h2"))
+            {
+                foreach (var dogdrip_Xneed in dogdrip_sitename.Descendants())
+                {
+                    foreach (var dogdrip_em in dogdrip_Xneed.SelectNodes("//em"))
+                    {
+                        dogdrip_em.InnerHtml = "";
+                    }
+                }
+                System.Console.WriteLine(dogdrip_sitename.InnerText.Trim());
+            }
+            foreach (var dogdrip_ul in dogdrip.DocumentNode.SelectNodes("//ul[@class= 'lt']"))
+            {
+                foreach (var dogdrip_li in dogdrip_ul.Descendants())
+                {
+                    foreach (var dogdrip_li1 in dogdrip_li.Descendants())
+                    {
+                        if (dogdrip_li1.Name == "a")
+                        {
+                            var content = new ContentDTO();
+                            var article = "";
+                            DateTime time = DateTime.Now;
+
+                            foreach (var dogdrip_article in dogdrip_li1.Descendants().Where(p => p.GetAttributeValue("class", "dd") == "title"))
+                            {
+                                foreach (var dogdrip_titletest in dogdrip_article.Descendants())
+                                {
+                                    foreach (var dogdrip_em in dogdrip_titletest.SelectNodes("//em"))
+                                    {
+                                        dogdrip_em.InnerHtml = "";
+                                    }
+                                }
+                                System.Console.Write(dogdrip_article.InnerText.Trim() + "-> ");
+                                article = (dogdrip_article.InnerText.Trim());
+                            }
+
+                            foreach (var dogdrip_time in dogdrip_li1.Descendants().Where(p => p.GetAttributeValue("class", "dd") == "time"))
+                            {
+                                dogdrip_timecount++;
+                                if (dogdrip_timecount == 1)
+                                {
+                                    System.Console.WriteLine(dogdrip_time.InnerText.Trim());
+
+                                    string timestring = dogdrip_time.InnerText.Trim();
+                                    time = Convert.ToDateTime(timestring);
+                                }
+                                else
+                                {
+                                    dogdrip_timecount = 0;
+                                }
+                            }
+
+                            HtmlAttribute dogdrip_url = dogdrip_li1.Attributes["href"];
+                            System.Console.Write(dogdrip_url.Value + " ");
+
+                            // url
+                            var url = (dogdrip_url.Value);
+                            // srcdata
+                            List<SrcdataDTO> SrcDatas = new List<SrcdataDTO>();
+
+                            //안의 내용을 가져오는 함수 실행.
+                            var innerArticle = RunContent(dogdrip_url.Value);
+                            var details = "";
+                            var details_html = "";
+
+                            //안의 내용 text
+                            if (innerArticle.First() != "")
+                            {
+                                details = innerArticle.First();
+                            }
+                            else
+                            {
+                                details = "내용이 없습니다.";
+                            }
+                       
+                            //안의 내용의 html
+                            if (innerArticle[1] != "")
+                            {
+                                details_html = innerArticle[1];
+                                SrcDatas = ParseSrc(innerArticle[1]); 
+                            }
+                       
+                            content = new ContentDTO
+                            {
+                                Crawled = time,
+                                For_BoardId = 11,
+                                Contents_URL = url,
+                                Article = article,
+                                Details = details,
+                                Details_Html = details_html,
+                                SrcDatas = SrcDatas
+                            };
+
+                            if (content.C_ContentGuId != null && content.For_BoardId != null && content.Article != null && content.Contents_URL != null && content.Crawled != null && content.Details != null && content.Details_Html != null)
+                            {
+                                SendContent(content);
+                            }
+                        }
+                    }
+                }
+            }
+            //var snapshot = new Snapshot();
+            //snapshot.C_SnapshotId = entities.Snapshots.Count() + 1;
+            //snapshot.For_WebsiteId = 11;
+            //snapshot.For_Timeperiod = 1;
+            //snapshot.Taken = DateTime.Now;
+
+            //if (snapshot.C_SnapshotId != null && snapshot.For_WebsiteId != null && snapshot.For_Timeperiod != null && snapshot.Taken != null)
+            //{
+            //    entities.Snapshots.Add(snapshot);
+            //}
+
+            //int contentSeq = 0;
+            //foreach (var content in contentList)
+            //{
+            //    var snapshotTocontent = new SnapshotToContent();
+            //    contentSeq++;
+            //    snapshotTocontent.For_SnapshotId = snapshot.C_SnapshotId;
+            //    snapshotTocontent.Has_ContentId = content;
+            //    snapshotTocontent.Seqno = contentSeq;
+
+            //    if (snapshotTocontent.For_SnapshotId!= null && snapshotTocontent.Has_ContentId != null && snapshotTocontent.Seqno != null)
+            //    {
+            //        entities.SnapshotToContents.Add(snapshotTocontent);
+            //    }
+            //}
+            //entities.SaveChanges();
+        }
+        public List<string> RunContent(string url)
+        {
+            var dogdripContents = webGetutf.Load(url);
+            //var content_count = 0;
+            List<string> details = new List<string>();
+            foreach (var content in dogdripContents.DocumentNode.SelectNodes("//div[@id = 'article_1']"))
+            {
+                System.Console.WriteLine("-------------------------------------------------------------------------------");
+                System.Console.WriteLine("내용");
+                string input = content.InnerText.Trim();
+                string input2 = content.InnerHtml.Trim();
+
+                System.Console.WriteLine(input);
+                System.Console.WriteLine(input2);
+                details.Add(input);
+                details.Add(input2);
+            }
+            return details;
+        }
+    }
+}

@@ -1,0 +1,16 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Crawler.Scheduler
+{
+    public class Class1
+    {
+        //Timer 실행 구간
+        //Common.Logging.LogManager.Adapter = new Common.Logging.Simple.ConsoleOutLoggerFactoryAdapter { Level = Common.Logging.LogLevel.Info };
+        //InitializeScheduler();
+        //System.Console.ReadLine();
+    }
+}

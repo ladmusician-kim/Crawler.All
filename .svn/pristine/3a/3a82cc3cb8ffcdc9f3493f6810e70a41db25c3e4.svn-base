@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<packages>
+  <package id="Common.Logging" version="2.3.1" targetFramework="net451" />
+  <package id="HtmlAgilityPack" version="1.4.9" targetFramework="net451" />
+  <package id="ImageProcessor" version="2.1.0.0" targetFramework="net451" />
+  <package id="protobuf-net" version="2.0.0.668" targetFramework="net451" />
+  <package id="Quartz" version="2.3" targetFramework="net451" />
+  <package id="ServiceStack" version="3.9.71" targetFramework="net451" />
+  <package id="ServiceStack.Common" version="3.9.71" targetFramework="net451" />
+  <package id="ServiceStack.OrmLite.SqlServer" version="3.9.71" targetFramework="net451" />
+  <package id="ServiceStack.Plugins.ProtoBuf" version="3.9.71" targetFramework="net451" />
+  <package id="ServiceStack.Redis" version="3.9.71" targetFramework="net451" />
+  <package id="ServiceStack.Text" version="3.9.71" targetFramework="net451" />
+</packages>

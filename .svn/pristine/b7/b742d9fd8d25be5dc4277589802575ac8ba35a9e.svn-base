@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+    <startup> 
+        <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.5.1" />
+    </startup>
+  <connectionStrings>
+    <add name="CrawlerStorage" connectionString="data source=192.168.0.20;initial catalog=Crawler;persist security info=True;user id=sa;password=rudtjq5Qk;MultipleActiveResultSets=True;App=EntityFramework" providerName="System.Data.SqlClient" />
+  </connectionStrings>
+</configuration>

@@ -1,0 +1,13 @@
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\bin\Debug\Crawler.ClientWPF.exe.config
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\bin\Debug\Crawler.ClientWPF.exe
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\bin\Debug\Crawler.ClientWPF.pdb
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\obj\Debug\Crawler.ClientWPF.csprojResolveAssemblyReference.cache
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\obj\Debug\MainWindow.baml
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\obj\Debug\MainWindow.g.cs
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\obj\Debug\App.g.cs
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\obj\Debug\Crawler.ClientWPF_MarkupCompile.cache
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\obj\Debug\Crawler.ClientWPF.g.resources
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\obj\Debug\Crawler.ClientWPF.Properties.Resources.resources
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\obj\Debug\Crawler.ClientWPF.csproj.GenerateResource.Cache
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\obj\Debug\Crawler.ClientWPF.exe
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\obj\Debug\Crawler.ClientWPF.pdb

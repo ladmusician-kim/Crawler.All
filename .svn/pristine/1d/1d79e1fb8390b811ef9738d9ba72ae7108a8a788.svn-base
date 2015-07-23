@@ -1,0 +1,164 @@
+﻿using Sitecrawler.Core.Interface;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HtmlAgilityPack;
+using Crawler.Data.DbContext;
+using System.Text.RegularExpressions;
+using Crawler.DTO.ResponseDTO;
+
+namespace Sitecrawler.Core.Code
+{
+    public class mparkCrawler : commonCrawler
+    {
+        // Icrawler로 부터 상속 받은 부분
+        public override bool Login(string Username, string Password)
+        {
+            return true;
+        }
+
+        public override void UpdateRecentArticles(int boardid)
+        {
+        }
+
+        public override void Noop()
+        {
+
+        }
+
+        public override void ParseComment()
+        {
+
+        }
+
+        public override void ParseClickNum()
+        {
+
+        }
+
+        public override void ParseLikeNum()
+        {
+
+        }
+        public override void Run()
+        {
+            List<ContentDTO> contentList = new List<ContentDTO>();
+            List<int> snapTocontentList = new List<int>();
+            
+            //commonCrawler로 부터 상속받은 부분
+            //엠팍
+            var mlbpark = webGetkr.Load("http://mlbpark.donga.com/mbs/articleL.php?mbsC=mlbtown");
+            System.Console.WriteLine("엠팍");
+
+            foreach (var mlbpark_ul in mlbpark.DocumentNode.SelectNodes("//ul[@id= 'mNewsList']"))
+            {
+                foreach (var mlbpark_li in mlbpark_ul.Descendants().Where(p => p.Name == "li"))
+                {
+                    var content = new ContentDTO();
+                        
+                    // 글 제목 (article)를 받아오는 곳
+                    var mlbpark_contents = mlbpark_li.Descendants().SingleOrDefault(p => p.GetAttributeValue("class", "dd") == "t");
+                    var mlbpark_article = mlbpark_contents.Descendants().SingleOrDefault(p => p.Name == "strong");
+                    var mlbpark_em = mlbpark_contents.Descendants().SingleOrDefault(p => p.Name == "em");
+                    var a_tag = mlbpark_li.Descendants().SingleOrDefault(p => p.Name == "a");
+
+                    HtmlAttribute mlbpark_url = a_tag.Attributes["href"];
+                    // url
+                    var url = ("http://mlbpark.donga.com/" + mlbpark_url.Value);
+                    // article
+                    var article = mlbpark_article.InnerText.Trim();
+
+
+                    List<string> timeList = new List<string>();
+                    foreach (var mlbpark_text in mlbpark_em.Descendants())
+                    {
+                        if (mlbpark_text.Name == "#text")
+                        {
+                            timeList.Add(mlbpark_text.InnerText.Trim());
+                        }
+                    }
+                        
+                    // 시간
+                    var timestring = timeList[2];
+                    DateTime time = DateTime.Parse(timestring);
+
+                    //안의 내용을 가져오는 함수 실행.
+                    var innerArticle = RunContent(url);
+
+                    var details = "";
+                    var details_html = "";
+                    List<SrcdataDTO> SrcDatas = new List<SrcdataDTO>();
+
+                    //안의 내용
+                    if (innerArticle.First() != "")
+                    {
+                        //details 저장
+                        details = innerArticle.First();
+                    }
+                    else
+                    {
+                        details = "내용이 없습니다.";
+                    }
+                    //안의 내용의 html
+                    if (innerArticle[1] != "")
+                    {
+                        //details_html 저장
+                        details_html = innerArticle[1];
+                        SrcDatas = ParseSrc(details_html);
+                    }
+
+                    System.Console.Write(time);
+                    System.Console.Write("http://mlbpark.donga.com/" + mlbpark_url.Value + " ");
+                    System.Console.WriteLine(article);
+
+                    contentList.Add(new ContentDTO
+                    {
+                        Crawled = time,
+                        Contents_URL = url,
+                        Article = article,
+                        Details = details,
+                        Details_Html = details_html,
+                        SrcDatas = SrcDatas
+                    });
+                }
+            }
+            SendSnapshot(contentList, 7);
+        }
+        public List<string> RunContent(string url)
+        {
+            var mparkContents = webGetkr.Load(url);
+            //var content_count = 0;
+            List<string> details = new List<string>();
+            if(mparkContents.DocumentNode.SelectNodes("//div[@class = 'article']") != null)
+            {
+                foreach (var content in mparkContents.DocumentNode.SelectNodes("//div[@class = 'article']"))
+                {
+                    foreach (var ct in content.Descendants())
+                    {
+                        if (ct.Name == "style")
+                        {
+                            ct.InnerHtml = "";
+                        }
+                    }
+
+                    System.Console.WriteLine("-------------------------------------------------------------------------------");
+                    System.Console.WriteLine("내용");
+                    string input = content.InnerText.Trim();
+                    string input2 = content.InnerHtml.Trim();
+                    System.Console.WriteLine(input);
+                    System.Console.WriteLine(input2);
+                    details.Add(input);
+                    details.Add(input2);
+                }
+            }
+            else
+            {
+                details.Add("내용 없음");
+                details.Add("내용 없음");
+            }
+            return details;
+        }
+    }
+}

@@ -1,0 +1,199 @@
+﻿using Sitecrawler.Core.Interface;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HtmlAgilityPack;
+using Crawler.Data.DbContext;
+using System.Text.RegularExpressions;
+using Crawler.DTO.ResponseDTO;
+
+namespace Sitecrawler.Core.Code
+{
+    public class IlbeCrawler : commonCrawler
+    {
+        // IlberCrawler로 부터 상속받은 부분
+        public override bool Login(string Username, string Password)
+        {
+            return true;
+        }
+
+        public override void UpdateRecentArticles(int boardid)
+        {
+        }
+
+        public override void Noop()
+        {
+
+        }
+
+        public override void ParseComment()
+        {
+
+        }
+
+        public override void ParseClickNum()
+        {
+
+        }
+
+        public override void ParseLikeNum()
+        {
+
+        }
+        public override void Run()
+        {
+
+            //commonCrawler로 부터 상속받은 부분
+            //일베
+            var ilbe = webGetutf.Load("http://www.ilbe.com/ilbe");
+            var ilbe_timecount = 0;
+            var ilbe_justforIlbe = 0;
+            System.Console.WriteLine("일베");
+
+            //content_guid를 저장하는 List
+            List<int> contentList = new List<int>();
+
+            foreach (var ilbe_ul in ilbe.DocumentNode.SelectNodes("//ul[@class= 'lt']"))
+            {
+                foreach (var ilbe_li in ilbe_ul.Descendants())
+                {
+                    ilbe_justforIlbe++;
+                    if (ilbe_justforIlbe > 60)
+                    {
+                        foreach (var ilbe_li1 in ilbe_li.Descendants())
+                        {
+                            if (ilbe_li1.Name == "a")
+                            {
+                                var content = new ContentDTO();
+                                var article = "";
+                                DateTime time = DateTime.Now;
+
+                                foreach (var ilbe_article in ilbe_li1.Descendants().Where(p => p.GetAttributeValue("class", "dd") == "title"))
+                                {
+                                    foreach (var ilbe_titletest in ilbe_article.Descendants())
+                                    {
+                                        foreach (var ilbe_em in ilbe_titletest.SelectNodes("//em"))
+                                        {
+                                            ilbe_em.InnerHtml = "";
+                                        }
+                                    }
+                                    System.Console.Write(ilbe_article.InnerText.Trim());
+                                    article = (ilbe_article.InnerText.Trim());
+                                }
+
+                                foreach (var ilbe_time in ilbe_li1.Descendants().Where(p => p.GetAttributeValue("class", "dd") == "time"))
+                                {
+                                    ilbe_timecount++;
+                                    if (ilbe_timecount == 1)
+                                    {
+                                        System.Console.WriteLine(ilbe_time.InnerText.Trim());
+
+                                        string timestring = ilbe_time.InnerText.Trim();
+                                        time = Convert.ToDateTime(timestring);
+                                    }
+                                    else
+                                    {
+                                        ilbe_timecount = 0;
+                                    }
+                                }
+
+                                HtmlAttribute ilbe_url = ilbe_li1.Attributes["href"];
+                                System.Console.Write(ilbe_url.Value + " ");
+                                var url = (ilbe_url.Value + " ");
+
+                                //안의 내용을 가져오는 함수 실행.
+                                var innerArticle = RunContent(url);
+
+                                var details = "";
+                                var details_html = "";
+                                List<SrcdataDTO> SrcDatas = new List<SrcdataDTO>();
+
+                                //안의 내용 text
+                                if (innerArticle.First() != "")
+                                {
+                                    content.Details = innerArticle.First();
+                                }
+                                else
+                                {
+                                    details = "내용이 없습니다.";
+                                }
+                                //안의 내용의 html
+                                if (innerArticle[1] != "")
+                                {
+                                    content.Details_Html = innerArticle[1];
+
+                                }
+
+                                content = new ContentDTO
+                                {
+                                    Crawled = time,
+                                    For_BoardId = 10,
+                                    Contents_URL = url,
+                                    Article = article,
+                                    Details = details,
+                                    Details_Html = details_html,
+                                    SrcDatas = SrcDatas
+                                };
+
+                                if (content.C_ContentGuId != null && content.For_BoardId != null && content.Article != null && content.Contents_URL != null && content.Crawled != null && content.Details != null && content.Details_Html != null)
+                                {
+                                    SendContent(content);
+                                }
+                               
+                            }
+                        }
+                    }
+                }
+            }
+
+            //var snapshot = new Snapshot();
+            //snapshot.C_SnapshotId = entities.Snapshots.Count() + 1;
+            //snapshot.For_WebsiteId = 10;
+            //snapshot.For_Timeperiod = 1;
+            //snapshot.Taken = DateTime.Now;
+
+            //if (snapshot.C_SnapshotId != null && snapshot.For_WebsiteId != null && snapshot.For_Timeperiod != null && snapshot.Taken != null)
+            //{
+            //    entities.Snapshots.Add(snapshot);
+            //}
+
+            //int contentSeq = 0;
+            //foreach (var content in contentList)
+            //{
+            //    var snapshotTocontent = new SnapshotToContent();
+            //    contentSeq++;
+            //    snapshotTocontent.For_SnapshotId= snapshot.C_SnapshotId ;
+            //    snapshotTocontent.Has_ContentId = content;
+            //    snapshotTocontent.Seqno = contentSeq;
+
+            //    if (snapshotTocontent.For_SnapshotId != null && snapshotTocontent.Has_ContentId != null && snapshotTocontent.Seqno != null)
+            //    {
+            //        entities.SnapshotToContents.Add(snapshotTocontent);
+            //    }
+            //}
+
+            //entities.SaveChanges();
+        }
+        public List<string> RunContent(string url)
+        {
+            var ruiwebContents = webGetutf.Load(url);
+            //var content_count = 0;
+            List<string> details = new List<string>();
+            foreach (var content in ruiwebContents.DocumentNode.SelectNodes("//div[@id = 'copy_layer_1']"))
+            {
+                System.Console.WriteLine("-------------------------------------------------------------------------------");
+                System.Console.WriteLine("내용");
+                string input = content.InnerText.Trim();
+                string input2 = content.InnerHtml.Trim();
+
+                System.Console.WriteLine(input);
+                System.Console.WriteLine(input2);
+                details.Add(input);
+                details.Add(input2);
+            }
+            return details;
+        }
+    }
+}

@@ -1,0 +1,42 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Sitecrawler.Core.Interface
+{
+    public interface ICrawler
+    {
+        void getList();
+
+        void getDetails();
+
+        void getImages();
+
+        void StartCrawl();
+
+        void LoadImages();
+
+        void GetContents();
+
+        void DownloadImages();
+
+        void SendSnapshot();
+
+        bool Login(string Username, string Password);
+
+        void UpdateRecentArticles(int boardid);
+
+        void Run();
+
+        void Noop();
+
+        void ParseComment();
+
+        void ParseClickNum();
+
+        void ParseLikeNum();
+    }
+
+}

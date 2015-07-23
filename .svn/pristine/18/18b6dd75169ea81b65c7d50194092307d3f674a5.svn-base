@@ -1,0 +1,182 @@
+﻿using Sitecrawler.Core.Interface;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HtmlAgilityPack;
+using Crawler.Data.DbContext;
+using System.Text.RegularExpressions;
+using ServiceStack.ServiceClient.Web;
+using Crawler.DTO.ResponseDTO;
+
+
+namespace Sitecrawler.Core.Code
+{
+    public class issueinCrawler : commonCrawler
+    {
+        
+        // Icrawler로 부터 상속받은 부분
+        public override bool Login(string Username, string Password)
+        {
+            return true;
+        }
+
+        public override void UpdateRecentArticles(int boardid)
+        {
+        }
+
+        public override void Noop()
+        {
+
+        }
+
+        public override void ParseComment()
+        {
+
+        }
+
+        public override void ParseClickNum()
+        {
+
+        }
+
+        public override void ParseLikeNum()
+        {
+
+        }
+
+        public override void StartCrawl()
+        {
+
+        }
+
+        public override void LoadImages()
+        {
+
+        }
+
+        public override void GetContents()
+        {
+
+        }
+
+        public override void DownloadImages()
+        {
+
+        }
+
+        public override void SendSnapshot()
+        {
+
+        }
+        public override void getList()
+        {
+            List<ContentDTO> contentList = new List<ContentDTO>();
+            List<int> snapTocontentList = new List<int>();
+
+            //commonCrawler로 부터 상속받은 부분
+            //이슈인
+            var issuein = webGetutf.Load("http://issuein.com/");
+            System.Console.WriteLine("이슈인");
+
+            foreach (var issuein_ul in issuein.DocumentNode.SelectNodes("//ul[@class= 'lt']"))
+            {
+                foreach (var issuein_li in issuein_ul.Descendants().Where(p=>p.Name == "li"))
+                {
+                    var issuein_li1 = issuein_li.Descendants().SingleOrDefault(p=>p.Name == "a");
+                    var content = new ContentDTO();
+                    
+                    var issuein_article = issuein_li1.Descendants().SingleOrDefault(p => p.GetAttributeValue("class", "dd") == "title");
+                    
+                    foreach (var issuein_em in issuein_article.Descendants().Where(p=>p.Name == "em"))
+                    {
+                        issuein_em.InnerHtml = "";
+                    }
+                    System.Console.Write(issuein_article.InnerText.Trim() + "-> ");
+                    var article = (issuein_article.InnerText.Trim());
+
+                    var timestring = issuein_li1.Descendants().SingleOrDefault(p => p.GetAttributeValue("class", "dd") == "time").InnerText.Trim();
+                    DateTime time = Convert.ToDateTime(timestring);
+
+                    System.Console.WriteLine(time);
+
+                    HtmlAttribute issuein_url = issuein_li1.Attributes["href"];
+                    string input_url = issuein_url.Value;
+                            
+                    //&amp 없애주는 함수 실행
+                    string result = ParseUrl(input_url);
+                    System.Console.Write(result + " ");
+                            
+                    // url
+                    var url = (result + " ");
+
+                    //안의 내용을 가져오는 함수 실행.
+                    var innerArticle = RunContent(url);
+
+                    var details = "";
+                    var details_html = "";
+                    List<SrcdataDTO> SrcDatas = new List<SrcdataDTO>();
+
+                    //안의 내용
+                    if (innerArticle.First() != "")
+                    {
+                        //details 저장
+                        details = innerArticle.First();
+                    }
+                    else
+                    {
+                        details = "내용이 없습니다.";
+                    }
+                    //안의 내용의 html
+                    if (innerArticle[1] != "")
+                    {
+                        //details_html 저장
+                        details_html = innerArticle[1];
+                        SrcDatas = ParseSrc(details_html);
+                    }
+                    contentList.Add(new ContentDTO
+                    {
+                        Crawled = time,
+                        Contents_URL = url,
+                        Article = article,
+                        Details = details,
+                        Details_Html = details_html,
+                        SrcDatas = SrcDatas
+                    });
+                }
+            }
+            SendSnapshot(contentList, 8);
+        }
+        public override void getDetails()
+        {
+
+        }
+        public override void getImages()
+        {
+
+        }
+        public override void Run()
+        {
+
+        }
+        public List<string> RunContent(string url)
+        {
+            var issueinContents = webGetutf.Load(url);
+            //var content_count = 0;
+            List<string> details = new List<string>();
+            foreach (var content in issueinContents.DocumentNode.SelectNodes("//div[@class = 'co']"))
+            {
+                System.Console.WriteLine("-------------------------------------------------------------------------------");
+                System.Console.WriteLine("내용");
+                string input = content.InnerText.Trim();
+                string input2 = content.InnerHtml.Trim();
+                System.Console.WriteLine(input);
+                System.Console.WriteLine(input2);
+                details.Add(input);
+                details.Add(input2);
+            }
+            return details;
+        }
+    }
+}

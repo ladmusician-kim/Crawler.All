@@ -1,0 +1,186 @@
+﻿using Sitecrawler.Core.Interface;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HtmlAgilityPack;
+using Crawler.Data.DbContext;
+using System.Text.RegularExpressions;
+using Crawler.DTO.ResponseDTO;
+
+namespace Sitecrawler.Core.Code
+{
+    public class humorCrwaler : commonCrawler
+    {
+        // Icrawler로 부터 상속 받은 부분
+        public override bool Login(string Username, string Password)
+        {
+            return true;
+        }
+
+        public override void UpdateRecentArticles(int boardid)
+        {
+        }
+
+        public override void Noop()
+        {
+
+        }
+
+        public override void ParseComment()
+        {
+
+        }
+
+        public override void ParseClickNum()
+        {
+
+        }
+
+        public override void ParseLikeNum()
+        {
+
+        }
+
+        public override void StartCrawl()
+        {
+
+        }
+
+        public override void LoadImages()
+        {
+
+        }
+
+        public override void GetContents()
+        {
+
+        }
+
+        public override void DownloadImages()
+        {
+
+        }
+
+        public override void SendSnapshot()
+        {
+
+        }
+
+        public override void getList()
+        {
+            List<ContentDTO> contentList = new List<ContentDTO>();
+            List<int> snapTocontentList = new List<int>();
+
+            //commonCrawler로 부터 상속받은 부분
+            //오유
+            var todayhumor = webGetutf.Load("http://m.todayhumor.co.kr/list.php?table=bestofbest");
+            //사이트 이름
+            System.Console.WriteLine("오유");
+
+            var todayhumor_contentscount = 0;
+
+            foreach (var todayhumor_a in todayhumor.DocumentNode.SelectNodes("//a[@href]"))
+            {
+                var content = new ContentDTO();
+
+                var article = "";
+                DateTime time = DateTime.Now;
+
+                todayhumor_contentscount++;
+                if (todayhumor_contentscount > 6 && todayhumor_contentscount < 27)
+                {
+                    var viewCount = todayhumor_a.Descendants().SingleOrDefault(p => p.GetAttributeValue("class", "dd") == "list_viewCount");
+                    var recommendCount = todayhumor_a.Descendants().SingleOrDefault(p => p.GetAttributeValue("class", "dd") == "list_okNokCount");
+                    
+                    var todayhumor_article = todayhumor_a.Descendants().SingleOrDefault(p => p.GetAttributeValue("class", "dd") == "listSubject");
+                    foreach (var todayhumor_span in todayhumor_article.Descendants().Where(p=>p.GetAttributeValue("class","dd") == "list_comment_count"))
+                    {
+                        todayhumor_span.InnerHtml = "";
+                    }
+                    System.Console.Write(todayhumor_article.InnerText.Trim() + "-> ");
+                    article = (todayhumor_article.InnerText.Trim() + "-> ");
+
+                    var timestring = todayhumor_a.Descendants().SingleOrDefault(p => p.GetAttributeValue("class", "dd") == "listDate").InnerText.Trim();
+                    System.Console.WriteLine(timestring);
+                    
+                    time = DateTime.Parse(timestring);
+
+                    HtmlAttribute todayhumor_url = todayhumor_a.Attributes["href"];
+                    System.Console.Write("http://m.todayhumor.co.kr/" + todayhumor_url.Value + " ");
+                    //url
+                    var url = ("http://m.todayhumor.co.kr/" + todayhumor_url.Value);
+
+                    //안의 내용을 가져오는 함수 실행.
+                    var innerArticle = RunContent("http://m.todayhumor.co.kr/" + todayhumor_url.Value + " ");
+                    
+                    var details = "";
+                    var details_html = "";
+                    List<SrcdataDTO> SrcDatas = new List<SrcdataDTO>();
+
+                    //안의 내용 text
+                    if (innerArticle.First() != "")
+                    {
+                        // 안의 내용
+                        details = innerArticle.First();
+                    }
+                    else
+                    {
+                        details = "내용이 없습니다.";
+                    }
+                    //안의 내용의 html
+                    if (innerArticle[1] != "")
+                    {
+                        //안의 html
+                        details_html = innerArticle[1];
+                        //안의 src
+                        SrcDatas = ParseSrc(details_html);
+
+                    }
+                    contentList.Add(new ContentDTO
+                    {
+                        Crawled = time,
+                        Contents_URL = url,
+                        Article = article,
+                        Details = details,
+                        Details_Html = details_html,
+                        SrcDatas = SrcDatas
+                    });
+                }
+            }
+            SendSnapshot(contentList, 9);
+        }
+        public override void getDetails()
+        {
+
+        }
+        public override void getImages()
+        {
+
+        }
+        public override void Run()
+        {
+
+        }
+        public List<string> RunContent(string url)
+        {
+            var humorContents = webGetutf.Load(url);
+            //var content_count = 0;
+            List<string> details = new List<string>();
+            foreach (var content in humorContents.DocumentNode.SelectNodes("//div[@class = 'view_content']"))
+            {
+                System.Console.WriteLine("-------------------------------------------------------------------------------");
+                System.Console.WriteLine("내용");
+                string input = content.InnerText.Trim();
+                string input2 = content.InnerHtml.Trim();
+
+                System.Console.WriteLine(input);
+                System.Console.WriteLine(input2);
+                details.Add(input);
+                details.Add(input2);
+            }
+            return details;
+        }
+    }
+}

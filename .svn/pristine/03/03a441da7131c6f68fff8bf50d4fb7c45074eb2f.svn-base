@@ -1,0 +1,196 @@
+﻿using Sitecrawler.Core.Interface;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HtmlAgilityPack;
+using Crawler.Data.DbContext;
+using System.Text.RegularExpressions;
+using Crawler.DTO.ResponseDTO;
+
+namespace Sitecrawler.Core.Code
+{
+    public class IlbeCrawler : commonCrawler
+    {
+        private readonly string url = "http://www.ilbe.com/ilbe";
+        private readonly HtmlWeb webGetutf = new HtmlWeb
+        {
+            UserAgent = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_3_2 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8H7 Safari/6533.18.5",
+            OverrideEncoding = Encoding.GetEncoding("UTF-8")
+        };
+
+        // IlberCrawler로 부터 상속받은 부분
+        public override bool Login(string Username, string Password)
+        {
+            return true;
+        }
+
+        public override void UpdateRecentArticles(int boardid)
+        {
+        }
+
+        public override void Noop()
+        {
+
+        }
+
+        //public override SnapshotDTO ParseList()
+        //{
+        //    var firstpage = webGetutf.Load("http://www.ilbe.com/index.php?mid=ilbe&page=1");
+        //    //var secondpage = webGetutf.Load("http://www.ilbe.com/index.php?mid=ilbe&page=2");
+        //    //var thirdpage = webGetutf.Load("http://www.ilbe.com/index.php?mid=ilbe&page=3");
+        //    var contentdiv = firstpage.DocumentNode.Descendants("ul").FirstOrDefault(c=> c.Attributes["class"].Value.Contains("lt"));
+        //    var childs = contentdiv.ChildNodes;
+        //    return null;
+        //}
+
+        public override void ParseComment()
+        {
+
+        }
+
+        public override void ParseClickNum()
+        {
+
+        }
+
+        public override void ParseLikeNum()
+        {
+
+        }
+
+        public override void StartCrawl()
+        {
+
+        }
+
+        public override void LoadImages()
+        {
+
+        }
+
+        public override void GetContents()
+        {
+
+        }
+
+        public override void DownloadImages()
+        {
+
+        }
+
+        public override void SendSnapshot()
+        {
+
+        }
+        public override void getList()
+        {
+            List<ContentDTO> contentList = new List<ContentDTO>();
+            List<int> snapTocontentList = new List<int>();
+
+            //commonCrawler로 부터 상속받은 부분
+            //일베
+            var ilbe = webGetutf.Load("http://www.ilbe.com/ilbe");
+            System.Console.WriteLine("일베");
+
+            var ilbe_ul = ilbe.DocumentNode.SelectNodes("//ul[@class= 'lt']").FirstOrDefault();
+            var articles = ilbe_ul.Descendants("li");
+
+            foreach (var ilbe_li in articles)
+            {
+                var eachitem = ilbe_li.SelectNodes(".//span[@class='notice']");
+
+                //공지사항은 제외
+                if (eachitem != null) continue;
+
+                //ilbe_justforIlbe++;
+                var anchortag = ilbe_li.ChildNodes.SingleOrDefault(c => c.Name.Equals("a"));
+                var titlenode = anchortag.SelectSingleNode("./span[@class='title']");
+                var authnode = anchortag.SelectSingleNode("./span[@class='auth']");
+
+                //댓글 갯수
+                titlenode.SelectSingleNode("./em").Remove();
+
+                //시간
+                var time = DateTime.Parse(authnode.Descendants().Where(p => p.GetAttributeValue("class", "dd") == "time").ToList().First().InnerText.Trim());
+                //buildobject;
+                contentList.Add(new ContentDTO
+                {
+                    Crawled = time,
+                    Contents_URL = anchortag.GetAttributeValue("href", "undefined"),
+                    Article = titlenode.InnerText.Trim(),
+                    Url_Params = anchortag.GetAttributeValue("href", "undefined").Substring(20, 10)
+                });
+            }
+
+            SendSnapshot(contentList, 10);
+        }
+        public override void getDetails()
+        {
+
+            var content = new ContentDTO();
+
+            ////안의 내용을 가져오는 함수 실행.
+            var innerArticle = RunContent(url);
+            var details = "";
+            var details_html = "";
+
+            //안의 내용 text
+            if (innerArticle.First() != "")
+            {
+                details = innerArticle.First();
+            }
+            else
+            {
+                details = "내용이 없습니다.";
+            }
+
+            //안의 내용의 html
+            if (innerArticle[1] != "")
+            {
+                details_html = innerArticle[1];
+
+            }
+
+            content.Details = details;
+            content.Details_Html = details_html;
+        }
+        public override void getImages()
+        {
+            List<ContentDTO> contentList = new List<ContentDTO>();
+
+            List<SrcdataDTO> SrcDatas = new List<SrcdataDTO>();
+
+            //SrcDatas = ParseSrc(details_html);
+
+            contentList.Add(new ContentDTO
+            {
+                SrcDatas = SrcDatas
+            });
+        }
+        public override void Run()
+        {
+
+        }
+
+        public List<string> RunContent(string url)
+        {
+            var ruiwebContents = webGetutf.Load(url);
+            //var content_count = 0;
+            List<string> details = new List<string>();
+            foreach (var content in ruiwebContents.DocumentNode.SelectNodes("//div[@id = 'copy_layer_1']"))
+            {
+                System.Console.WriteLine("-------------------------------------------------------------------------------");
+                System.Console.WriteLine("내용");
+                string input = content.InnerText.Trim();
+                string input2 = content.InnerHtml.Trim();
+                System.Console.WriteLine(input);
+                System.Console.WriteLine(input2);
+                details.Add(input);
+                details.Add(input2);
+            }
+            return details;
+        }
+    }
+}

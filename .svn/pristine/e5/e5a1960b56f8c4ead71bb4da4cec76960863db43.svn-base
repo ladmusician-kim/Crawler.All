@@ -1,0 +1,306 @@
+﻿using Quartz;
+using Quartz.Impl;
+using Sitecrawler.Core.Code;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Crawler.Scheduler.Jobs
+{
+    public class CrawlInstance
+    {
+        IJobDetail Ilbejob;
+        IJobDetail Ruiwebjob;
+        IJobDetail Cookjob;
+        IJobDetail Dogdripjob;
+        IJobDetail Humorjob;
+        IJobDetail Bobaejob;
+        IJobDetail Issueinjob;
+        IJobDetail Mparkjob;
+        IJobDetail Natejob;
+        IJobDetail pomppujob;
+        IJobDetail slrjob;
+        IJobDetail soccerLinejob;
+
+        IScheduler scheduler;
+
+        public CrawlInstance()
+        {
+            scheduler = StdSchedulerFactory.GetDefaultScheduler();
+        }
+
+        public void AddJob()
+        {
+            /*
+            Bobaejob = JobBuilder.Create<CrawlBobae>()
+                            .WithIdentity("Bobaejob", "group1")
+                            .Build();
+            
+            Ilbejob = JobBuilder.Create<CrawlIlbe>()
+                        .WithIdentity("Ilbejob", "group1")
+                        .Build();
+
+            Ruiwebjob = JobBuilder.Create<CrawlRuiweb>()
+                            .WithIdentity("Ruiwebjob", "group1")
+                            .Build();
+
+            Cookjob = JobBuilder.Create<CrawlCook>()
+                            .WithIdentity("Cookjob", "group1")
+                            .Build();
+
+            Dogdripjob = JobBuilder.Create<CrawlDogdrip>()
+                            .WithIdentity("Dogdripjob", "group1")
+                            .Build();
+
+            Humorjob = JobBuilder.Create<CrawlHumor>()
+                            .WithIdentity("Humorjob", "group1")
+                            .Build();
+            
+            Issueinjob = JobBuilder.Create<CrawlIsuue>()
+                            .WithIdentity("Issueinjob", "group1")
+                            .Build();
+            */
+            Mparkjob = JobBuilder.Create<CrawlMpark>()
+                            .WithIdentity("Mparkjob", "group1")
+                            .Build();
+            /*
+            Natejob = JobBuilder.Create<Crawlnate>()
+                            .WithIdentity("Natejob", "group1")
+                            .Build();
+
+            pomppujob = JobBuilder.Create<Crawlnate>()
+                            .WithIdentity("pomppujob", "group1")
+                            .Build();
+
+            slrjob = JobBuilder.Create<Crawlnate>()
+                            .WithIdentity("slrjob", "group1")
+                            .Build();
+
+            soccerLinejob = JobBuilder.Create<Crawlnate>()
+                            .WithIdentity("soccerLinejob", "group1")
+                            .Build();
+            */
+            /*
+            ITrigger trigger = TriggerBuilder.Create()
+                   .WithIdentity("trigger1", "group1")
+                   .StartNow()
+                   .WithSimpleSchedule(x => x
+                       .WithIntervalInSeconds(60)
+                       .RepeatForever())
+                   .Build();
+            
+            ITrigger trigger1 = TriggerBuilder.Create()
+                   .WithIdentity("trigger2", "group1")
+                   .StartNow()
+                   .WithSimpleSchedule(x => x
+                       .WithIntervalInSeconds(60)
+                       .RepeatForever())
+                   .Build();
+
+            ITrigger trigger2 = TriggerBuilder.Create()
+                  .WithIdentity("trigger3", "group1")
+                  .StartNow()
+                  .WithSimpleSchedule(x => x
+                      .WithIntervalInSeconds(60)
+                      .RepeatForever())
+                  .Build();
+
+            ITrigger trigger3 = TriggerBuilder.Create()
+                  .WithIdentity("trigger4", "group1")
+                  .StartNow()
+                  .WithSimpleSchedule(x => x
+                      .WithIntervalInSeconds(60)
+                      .RepeatForever())
+                  .Build();
+
+            ITrigger trigger4 = TriggerBuilder.Create()
+                  .WithIdentity("trigger5", "group1")
+                  .StartNow()
+                  .WithSimpleSchedule(x => x
+                      .WithIntervalInSeconds(60)
+                      .RepeatForever())
+                  .Build();
+
+            ITrigger trigger5 = TriggerBuilder.Create()
+                 .WithIdentity("trigger6", "group1")
+                 .StartNow()
+                 .WithSimpleSchedule(x => x
+                     .WithIntervalInSeconds(60)
+                     .RepeatForever())
+                 .Build();
+
+            ITrigger trigger6 = TriggerBuilder.Create()
+                 .WithIdentity("trigger7", "group1")
+                 .StartNow()
+                 .WithSimpleSchedule(x => x
+                     .WithIntervalInSeconds(60)
+                     .RepeatForever())
+                 .Build();
+            */
+            ITrigger trigger7 = TriggerBuilder.Create()
+                 .WithIdentity("trigger8", "group1")
+                 .StartNow()
+                 .WithSimpleSchedule(x => x
+                     .WithIntervalInSeconds(10)
+                     .RepeatForever())
+                 .Build();
+            /*
+            ITrigger trigger8 = TriggerBuilder.Create()
+                 .WithIdentity("trigger9", "group1")
+                 .StartNow()
+                 .WithSimpleSchedule(x => x
+                     .WithIntervalInSeconds(60)
+                     .RepeatForever())
+                 .Build();
+
+            ITrigger trigger9 = TriggerBuilder.Create()
+                 .WithIdentity("trigger10", "group1")
+                 .StartNow()
+                 .WithSimpleSchedule(x => x
+                     .WithIntervalInSeconds(60)
+                     .RepeatForever())
+                 .Build();
+
+            ITrigger trigger10 = TriggerBuilder.Create()
+                 .WithIdentity("trigger11", "group1")
+                 .StartNow()
+                 .WithSimpleSchedule(x => x
+                     .WithIntervalInSeconds(60)
+                     .RepeatForever())
+                 .Build();
+
+            ITrigger trigger11 = TriggerBuilder.Create()
+                 .WithIdentity("trigger12", "group1")
+                 .StartNow()
+                 .WithSimpleSchedule(x => x
+                     .WithIntervalInSeconds(60)
+                     .RepeatForever())
+                 .Build();
+            */
+            /*
+            scheduler.ScheduleJob(Bobaejob, trigger);
+            scheduler.ScheduleJob(Ruiwebjob, trigger1);
+            scheduler.ScheduleJob(Cookjob, trigger2);
+            scheduler.ScheduleJob(Dogdripjob, trigger3);
+            scheduler.ScheduleJob(Humorjob, trigger4);
+            scheduler.ScheduleJob(Ilbejob, trigger5);
+            scheduler.ScheduleJob(Issueinjob, trigger6);
+            */
+            scheduler.ScheduleJob(Mparkjob, trigger7);
+            /*
+            scheduler.ScheduleJob(Natejob, trigger8);
+            scheduler.ScheduleJob(pomppujob, trigger9);
+            scheduler.ScheduleJob(slrjob, trigger10);
+            scheduler.ScheduleJob(soccerLinejob, trigger11);
+            */
+        }
+
+        public void Start()
+        {
+            scheduler.Start();
+        }
+
+        public void Stop()
+        {
+            scheduler.Shutdown();
+        }
+
+    }
+    public class CrawlBobae : IJob
+    {
+        public void Execute(IJobExecutionContext context)
+        {
+            bobaedreamCrawler bobae = new bobaedreamCrawler();
+            bobae.Run();
+        }
+    }
+    public class CrawlIlbe : IJob
+    {
+        public void Execute(IJobExecutionContext context)
+        {
+            bobaedreamCrawler bobae = new bobaedreamCrawler();
+            bobae.Run();
+        }
+    }
+    public class CrawlRuiweb : IJob
+    {
+        public void Execute(IJobExecutionContext context)
+        {
+            ruiwebCrawler ruiweb = new ruiwebCrawler();
+            ruiweb.Run();        }
+    }
+    public class CrawlCook: IJob
+    {
+        public void Execute(IJobExecutionContext context)
+        {
+            cookCrawler cook = new cookCrawler();
+            cook.Run();
+        }
+    }
+    public class CrawlDogdrip : IJob
+    {
+        public void Execute(IJobExecutionContext context)
+        {
+            dogdripCrawler dogdrip = new dogdripCrawler();
+            dogdrip.Run();
+        }
+    }
+    public class CrawlHumor : IJob
+    {
+        public void Execute(IJobExecutionContext context)
+        {
+            humorCrwaler humor = new humorCrwaler();
+            humor.Run();
+        }
+    }
+    public class CrawlIsuue : IJob
+    {
+        public void Execute(IJobExecutionContext context)
+        {
+            issueinCrawler issuein = new issueinCrawler();
+            issuein.Run();
+        }
+    }
+    public class CrawlMpark : IJob
+    {
+        public void Execute(IJobExecutionContext context)
+        {
+            mparkCrawler mpark = new mparkCrawler();
+            mpark.Run();
+        }
+    }
+    public class Crawlnate : IJob
+    {
+        public void Execute(IJobExecutionContext context)
+        {
+            nateCrawler nate = new nateCrawler();
+            nate.Run();
+        }
+    }
+    public class Crawlpomppu: IJob
+    {
+        public void Execute(IJobExecutionContext context)
+        {
+            pomppuCrawler pomppu = new pomppuCrawler();
+            pomppu.Run();
+        }
+    }
+    public class Crawlslr : IJob
+    {
+        public void Execute(IJobExecutionContext context)
+        {
+            slrclubCrawler slr = new slrclubCrawler();
+            slr.Run();
+        }
+    }
+    public class CrawlsoccerLine : IJob
+    {
+        public void Execute(IJobExecutionContext context)
+        {
+            soccerlineCrawler soccerLine = new soccerlineCrawler();
+            soccerLine.Run();
+        }
+    }
+}

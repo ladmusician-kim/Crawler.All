@@ -1,0 +1,52 @@
+﻿using Crawler.Data.DbContext;
+using Crawler.DTO.RequestDTO;
+using Crawler.DTO.ResponseDTO;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Crawler.API.ServiceCode
+{
+    public partial class CrawlerService : ServiceBase
+    {
+        public EnvelopeDTO<TimePeriodDTO> Any(TimePeriodGetbyIdRequestDTO req)
+        {
+            var TimeperiodId = req.TimeperiodId;
+
+            if (TimeperiodId == null)
+            {
+                return Fail<TimePeriodDTO>("TimePeriodGetbyIdRequestDTO : parameter 'TimeperiodId' is empty.");
+            }
+
+            using (var entities = new CrawlerStorage())
+            {
+                try
+                {
+                    var timePeriod = (from t in entities.TimePeriods
+                                 where t.Id == TimeperiodId
+                                   select new TimePeriodDTO
+                                 {
+                                     Id = t.Id,
+                                     Label = t.Label,
+                                     Scheduled = t.Scheduled,
+                                     Crawled = t.Crawled
+
+                                 }).SingleOrDefault();
+
+                    if (timePeriod == null)
+                    {
+                        return Fail<TimePeriodDTO>("TimePeriodGetbyIdRequestDTO : Website matching given 'WebsiteId' does not exist.");
+                    }
+
+                    return Succeeded(timePeriod);
+                }
+
+                catch (Exception e)
+                {
+                    return Fail<TimePeriodDTO>("TimePeriodGetbyIdRequestDTO : Exception - " + e.Message);
+                }
+            }
+        }
+    }
+}

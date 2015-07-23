@@ -1,0 +1,194 @@
+﻿using Crawler.Data.DbContext;
+using Crawler.DTO.RequestDTO;
+using Crawler.DTO.ResponseDTO;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Transactions; 
+
+namespace Crawler.API.ServiceCode
+{
+    public partial class CrawlerService : ServiceBase
+    {                
+        /// <summary>
+        /// Timepriod를 TimeperiodId를 통해 가져오는 함수
+        /// </summary>
+        /// <param name="req">
+        /// TimeperiodId
+        /// </param>
+        /// <returns>
+        /// TimeperiodDTO
+        /// </returns>
+        public EnvelopeDTO<TimePeriodDTO> Any(TimePeriodGetbyIdRequestDTO req)
+        {
+            var TimeperiodId = req.TimeperiodId;
+
+            if (TimeperiodId.HasValue)
+            {
+                return Fail<TimePeriodDTO>("TimePeriodGetbyIdRequestDTO : parameter 'TimeperiodId' is empty.");
+            }
+            else
+            {
+                using (var entities = new CrawlerStorage())
+                {
+                    try
+                    {
+                        var timePeriod = (from t in entities.TimePeriods.AsNoTracking()
+                                          where t.Id == TimeperiodId
+                                          select new TimePeriodDTO
+                                          {
+                                              Id = t.Id,
+                                              Label = t.Label,
+                                              Scheduled = t.Scheduled,
+                                              Crawled = t.Crawled
+
+                                          }).SingleOrDefault();
+
+                        if (timePeriod == null)
+                        {
+                            return Fail<TimePeriodDTO>("TimePeriodGetbyIdRequestDTO : TimePeriod matching given 'WebsiteId' does not exist.");
+                        }
+
+                        return Succeeded(timePeriod);
+                    }
+
+                    catch (Exception e)
+                    {
+                        return Fail<TimePeriodDTO>("TimePeriodGetbyIdRequestDTO : Exception - " + e.Message);
+                    }
+                }
+            }
+        }
+
+        //public EnvelopeDTO<TimePeriodDTO> Any(TimePeriodGetCurrentRequestDTO req)
+        //{
+        //    //using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel. }))
+        //    //{
+                
+        //    //    scope.Complete();
+        //    //}
+           
+        //}
+
+        /// <summary>
+        /// Timeperiod를 Label, Scheduled, Crawled 를 통해서 Create 하는 함수
+        /// </summary>
+        /// <param name="req">
+        /// Label
+        /// </param>
+        /// <param name="req">
+        /// Scheduled
+        /// </param>
+        /// <param name="req">
+        /// Crawled
+        /// </param>
+        /// <returns></returns>
+        /// 
+
+        public EnvelopeDTO<GenericDummyDTO> Any(TimePeriodDeleteRequestDTO req)
+        {
+            return null;
+        }
+
+        public EnvelopeDTO<GenericDummyDTO> Any(TimePeriodCreateRequestDTO req)
+        {
+            var Label = req.Label;
+            var Scheduled = req.Scheduled;
+            var Crawled = req.Crawled;
+
+            if (string.IsNullOrWhiteSpace(Label) && Scheduled.HasValue && Crawled.HasValue)
+            {
+                return Fail<GenericDummyDTO>("TimePeriodCreateRequestDTO : parameter 'Label' is empty.");
+            }
+            if (!string.IsNullOrWhiteSpace(Label) && !Scheduled.HasValue && Crawled.HasValue)
+            {
+                return Fail<GenericDummyDTO>("TimePeriodCreateRequestDTO : parameter 'Scheduled' is empty.");
+            }
+            if (!string.IsNullOrWhiteSpace(Label) && Scheduled.HasValue && !Crawled.HasValue)
+            {
+                return Fail<GenericDummyDTO>("TimePeriodCreateRequestDTO : parameter 'Crawled' is empty.");
+            }
+            if (string.IsNullOrWhiteSpace(Label) && !Scheduled.HasValue && Crawled.HasValue)
+            {
+                return Fail<GenericDummyDTO>("TimePeriodCreateRequestDTO : parameter 'Label' && 'Scheduled' are empty.");
+            }
+            if (string.IsNullOrWhiteSpace(Label) && Scheduled.HasValue && !Crawled.HasValue)
+            {
+                return Fail<GenericDummyDTO>("TimePeriodCreateRequestDTO : parameter 'Label' && 'Crawled' are empty.");
+            }
+            if (!string.IsNullOrWhiteSpace(Label) && !Scheduled.HasValue && !Crawled.HasValue)
+            {
+                return Fail<GenericDummyDTO>("TimePeriodCreateRequestDTO : parameter 'Scheduled' && 'Crawled' are empty.");
+            }
+            if (string.IsNullOrWhiteSpace(Label) && !Scheduled.HasValue && !Crawled.HasValue)
+            {
+                return Fail<GenericDummyDTO>("TimePeriodCreateRequestDTO : parameter 'Label' && 'Scheduled' && 'Crawled' are empty.");
+            }
+            else
+            {
+                using (var entities = new CrawlerStorage())
+                {
+                    try
+                    {
+                        var timeperiod = new TimePeriod();
+                        timeperiod.Label = Label;
+                        timeperiod.Scheduled = Scheduled.Value;
+                        timeperiod.Crawled = Crawled.Value;
+
+                        entities.TimePeriods.Add(timeperiod);
+
+                        entities.SaveChanges();
+
+                        return Succeeded(new GenericDummyDTO());
+                    }
+                    catch (System.Data.Entity.Validation.DbEntityValidationException dbEx)
+                    {
+                        Exception raise = dbEx;
+                        foreach (var validationErrors in dbEx.EntityValidationErrors)
+                        {
+                            foreach (var validationError in validationErrors.ValidationErrors)
+                            {
+                                string message = string.Format("{0}:{1}",
+                                    validationErrors.Entry.Entity.ToString(),
+                                    validationError.ErrorMessage);
+                                raise = new InvalidOperationException(message, raise);
+                            }
+                        }
+                        throw raise;
+                    }
+                }
+            }
+        }
+
+        public EnvelopeDTO<List<TimePeriodDTO>> Any(TimePeriodGetUpcomingRequestDTO req)
+        {
+            return null;
+        }
+
+        public EnvelopeDTO<GenericDummyDTO> Any(TimePeriodBatchGenerateRequestDTO req)
+        {
+            var begin = req.Begin;
+            var end = req.End;
+            var interval = req.MinuteInterval.GetValueOrDefault(5);
+
+            while(begin <= end)
+            {
+                var timeperiod = new TimePeriod
+                {
+                    ShortGuid = Guid.NewGuid().ToShortGuid(),
+                    Scheduled = begin,
+                    Label = begin.ToString("yyyy-MM-dd HH:mm"),
+                };
+
+                context.TimePeriods.Add(timeperiod);
+
+                begin.AddMinutes(interval);
+            }
+
+            context.SaveChanges();
+           
+            return Succeeded(new GenericDummyDTO());
+        }
+    }
+}

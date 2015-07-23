@@ -1,0 +1,20 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Crawler.DTO.RequestDTO
+{
+    public class TimePeriodGetbyIdRequestDTO
+    {
+        public int? TimeperiodId { get; set; }
+    }
+
+    public class TimePeriodCreateRequestDTO
+    {
+        public string Label { get; set; }
+        public DateTime? Scheduled { get; set; }
+        public DateTime? Crawled { get; set; }
+    }
+}

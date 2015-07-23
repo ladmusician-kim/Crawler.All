@@ -1,0 +1,22 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Crawler.DTO.RequestDTO
+{
+    public class SnapshotToContentCreateRequestDTO
+    {
+        public int In_WebsiteId { get; set; }
+        public int For_SnapshotId { get; set; }
+        public int Has_ContentId { get; set; }
+        public int Seqno { get; set; }
+    }
+    public class SnapshotToContentGetbyIdRequestDTO
+    {
+        public int In_WebsiteId { get; set; }
+        public int For_SnapshotId { get; set; }
+        public int Has_ContentId { get; set; }
+    }
+}

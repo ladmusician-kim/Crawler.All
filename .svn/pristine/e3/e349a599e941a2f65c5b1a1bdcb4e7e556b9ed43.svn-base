@@ -1,0 +1,51 @@
+﻿using Crawler.Data.DbContext;
+using Crawler.DTO.RequestDTO;
+using Crawler.DTO.ResponseDTO;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Crawler.API.ServiceCode
+{
+    public partial class CrawlerService : ServiceBase
+    {
+        public EnvelopeDTO<WebsiteDTO> Any(WebsiteGetRequestDTO req)
+        {
+            var websiteId = req.WebsiteId;
+
+            if (websiteId == null)
+            {
+                return Fail<WebsiteDTO>("WebsiteGetRequestDTO : parameter 'websiteId' is empty.");
+            }
+
+            using (var entities = new CrawlerStorage())
+            {
+                try
+                {           
+                    var website = (from w in entities.Websites
+                                 where w.Id == websiteId
+                                 select new WebsiteDTO
+                                 {
+                                     Id = w.Id,
+                                     Label = w.Label,
+                                     Website_URL = w.Website_URL,
+                                     Mobile_URL = w.Mobile_URL
+                                 }).SingleOrDefault();
+
+                    if (website == null)
+                    {
+                        return Fail<WebsiteDTO>("WebsiteGetRequestDTO : Website matching given 'WebsiteId' does not exist.");
+                    }
+
+                    return Succeeded(website);
+                }
+
+                catch (Exception e)
+                {
+                    return Fail<WebsiteDTO>("WebsiteGetRequestDTO : Exception - " + e.Message);
+                }
+            }
+        }
+    }
+}

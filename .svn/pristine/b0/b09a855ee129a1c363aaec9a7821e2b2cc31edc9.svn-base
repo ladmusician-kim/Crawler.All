@@ -1,0 +1,203 @@
+﻿using Sitecrawler.Core.Interface;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HtmlAgilityPack;
+using Crawler.Data.DbContext;
+using System.Text.RegularExpressions;
+
+
+namespace Sitecrawler.Core.Code
+{
+    public class cookCrawler : commonCrawler
+    {
+        // Icrawler로 부터 상속받은 부분
+        public override bool Login(string Username, string Password)
+        {
+            return true;
+        }
+
+        public override void UpdateRecentArticles(int boardid)
+        {
+        }
+
+        public override void Noop()
+        {
+
+        }
+
+        public override void ParseComment()
+        {
+
+        }
+
+        public override void ParseClickNum()
+        {
+
+        }
+
+        public override void ParseLikeNum()
+        {
+
+        }
+        public override void Run()
+        {
+            var entities = new CrawlerStorage();
+
+            //commonCrawler로 부터 상속받은 부분
+            // 82cook
+            var cook = webGetutf.Load("http://www.82cook.com/entiz/enti.php?bn=15");
+            var cook_licount = 0;
+            System.Console.WriteLine("82cook");
+
+            //content_guid를 저장하는 List
+            List<Guid> contentList = new List<Guid>();
+
+            foreach (var cook_div in cook.DocumentNode.SelectNodes("//td[@class= 'title']"))
+            {
+                var content = new Content();
+
+                cook_licount++;
+                if (cook_licount > 3)
+                {
+                    var nextsiblings = cook_div.NextSibling;
+                    var nextnextsiblings = nextsiblings.NextSibling;
+                    var nextnextnextsibling = nextnextsiblings.NextSibling;
+                    var cook_time = nextnextnextsibling.NextSibling;
+                    System.Console.WriteLine(cook_time.InnerText.Trim());
+
+                    string time = cook_time.InnerText.Trim();
+                    DateTime c_time = Convert.ToDateTime(time);
+
+                    //Db -> content/crawled(글 등록 시간) 에 저장하는 부분
+                    content.crawled = c_time;
+                    //Db -> content/for_boardid 에 저장하는 부분
+                    content.for_boardid = 1;
+                    //Db -> content/for_websiteid 에 저장하는 부분
+                    content.for_websiteid = 3;
+                    //Db -> content/_contentguid 에 저장하는 부분
+                    content.C_contentguid = Guid.NewGuid();
+                    //content_guid를 저장하는 부분
+                    contentList.Add(content.C_contentguid);
+
+                    foreach (var cook_article in cook_div.Descendants())
+                    {
+                        if (cook_article.Name == "a")
+                        {
+                            HtmlAttribute cook_url = cook_article.Attributes["href"];
+                            string input_url = cook_url.Value;
+                            string pattern_url = "&amp;";
+                            string replacement = "&";
+                            string result = Regex.Replace(input_url, pattern_url, replacement);
+                            System.Console.Write("http://www.82cook.com/entiz/" + result + " ");
+                            content.contents_url = ("http://www.82cook.com/entiz/" + result);
+
+                            //안의 내용을 가져오는 함수 실행.
+                            var details = RunContent("http://www.82cook.com/entiz/" + result);
+
+                            //안의 내용 text
+                            if (details.First() != "")
+                            {
+                                content.details = details.First();
+                            }
+                            else
+                            {
+                                content.details = "내용 없음";
+                            }
+                            //안의 내용의 html
+                            if (details[1] != "")
+                            {
+                                content.details_html = details[1];
+
+                                string input_src = details[1];
+                                string pattern_src = "src=[\"'](.+?)[\"'].*?>";
+                                if (Regex.Matches(input_src, pattern_src).Count > 0)
+                                {
+                                    foreach (Match m in Regex.Matches(input_src, pattern_src))
+                                    {
+                                        var srcdata = new Srcdata();
+                                        System.Console.WriteLine("-------------------------------------------------------------------------------");
+                                        System.Console.WriteLine(m.Value);
+                                        srcdata.C_srcid = Guid.NewGuid();
+                                        srcdata.for_contentid = content.C_contentguid;
+                                        srcdata.src = m.Value;
+                                        if (srcdata.C_srcid != null && srcdata.for_contentid != null && srcdata.src != null)
+                                        {
+                                            entities.Srcdatas.Add(srcdata);
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                content.details = "내용 없음";
+                            }
+
+                            System.Console.Write(cook_article.InnerText.Trim() + " ");
+                            content.article = (cook_article.InnerText.Trim() + " ");
+                        }
+                    }
+                }
+                if(content.article != null && content.contents_url != null && content.crawled != null && content.details != null && content.details_html != null)
+                {
+                    entities.Contents.Add(content);
+                }
+            }
+            var snapshot = new Snapshot();
+            snapshot.C_snapshotid = entities.Snapshots.Count() + 1;
+            snapshot.for_websiteid = 3;
+            snapshot.for_timeperiod = 1;
+            snapshot.taken = DateTime.Now;
+
+            if (snapshot.C_snapshotid != null && snapshot.for_websiteid != null && snapshot.for_timeperiod != null && snapshot.taken != null)
+            {
+                entities.Snapshots.Add(snapshot);
+            }
+
+            int contentSeq = 0;
+            foreach (var content in contentList)
+            {
+                var snapshotTocontent = new SnapshotToContent();
+                contentSeq++;
+                snapshotTocontent.for_snapshotid = snapshot.C_snapshotid;
+                snapshotTocontent.has_contentid = content;
+                snapshotTocontent.seqno = contentSeq;
+
+                if (snapshotTocontent.for_snapshotid != null && snapshotTocontent.has_contentid != null && snapshotTocontent.seqno != null)
+                {
+                    entities.SnapshotToContents.Add(snapshotTocontent);
+                }
+            }
+
+            entities.SaveChanges();
+        }
+        public List<string> RunContent(string url)
+        {
+            var ruiwebContents = webGetutf.Load(url);
+            //var content_count = 0;
+            List<string> details = new List<string>();
+            foreach (var content in ruiwebContents.DocumentNode.SelectNodes("//div[@id = 'articleBody']"))
+            {
+                System.Console.WriteLine("-------------------------------------------------------------------------------");
+                System.Console.WriteLine("내용");
+                string input = content.InnerText.Trim();
+                string input2 = content.InnerHtml.Trim();
+                string pattern = "<!-- s : 기사 본문 -->";
+                string pattern2 = "<!-- e : 기사 본문 -->";
+                string replacement = "";
+                string result = Regex.Replace(input, pattern, replacement);
+                string result_1 = Regex.Replace(result, pattern2, replacement);
+                string result2 = Regex.Replace(input2, pattern, replacement);
+                string result2_1 = Regex.Replace(result2, pattern2, replacement);
+
+                System.Console.WriteLine(result_1.Trim());
+                System.Console.WriteLine(result2_1.Trim());
+                details.Add(result_1.Trim());
+                details.Add(result2_1.Trim());
+            }
+            return details;
+        }
+    }
+}

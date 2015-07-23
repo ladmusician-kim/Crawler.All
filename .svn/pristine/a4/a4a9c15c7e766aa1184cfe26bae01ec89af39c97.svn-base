@@ -1,0 +1,32 @@
+﻿'use strict';
+
+
+// Demonstrate how to register services
+// In this case it is a simple constant service.
+angular.module('crawlerApp.services')
+    .factory('Website', function ($http, $state, $cookieStore, CrawlerApi) {
+        return {
+            getWebsite: function (websiteId, callback, error) {
+                CrawlerApi.get("/WebsiteGetbyIdRequestDTO", { WebsiteId: websiteId },
+					function (data) {
+					    callback(data);
+					},
+					function (msg) {
+					    error(msg);
+					}
+				);
+                return null;
+            },
+            getWebsiteList: function (callback, error) {
+                CrawlerApi.get("/WebsiteGetListRequestDTO", {},
+					function (data) {
+					    callback(data);
+					},
+					function (msg) {
+					    error(msg);
+					}
+				);
+                return null;
+            }
+        };
+    });

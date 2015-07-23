@@ -1,0 +1,120 @@
+﻿using Crawler.Data.DbContext;
+using Crawler.DTO.RequestDTO;
+using Crawler.DTO.ResponseDTO;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Crawler.API.ServiceCode
+{
+    public partial class CrawlerService : ServiceBase
+    {
+        /// <summary>
+        /// Board를 BoardId 를 통해서 불러오는 함수
+        /// </summary>
+        /// <param name="req">
+        /// BoardId
+        /// </param>
+        /// <returns></returns>
+        public EnvelopeDTO<BoardDTO> Any(BoardGetbyIdRequestDTO req)
+        {
+            var boardid = req.BoardId;
+
+            if (!boardid.HasValue)
+            {
+                return Fail<BoardDTO>("BoardGetRequestDTO : parameter 'boardid' is empty.");
+            }
+            else
+            {
+                using (var entities = new CrawlerStorage())
+                {
+                    try
+                    {
+                        var board = (from b in entities.Boards
+                                     where b.Id == boardid
+                                     select new BoardDTO
+                                     {
+                                         Id = b.Id,
+                                         For_WebsiteId = b.For_WebsiteId,
+                                         Label = b.Label
+                                     }).SingleOrDefault();
+
+                        if (board == null)
+                        {
+                            return Fail<BoardDTO>("BoardGetRequestDTO : Board matching given 'BoardId' does not exist.");
+                        }
+
+                        return Succeeded(board);
+                    }
+                    catch (Exception e)
+                    {
+                        return Fail<BoardDTO>("BoardGetRequestDTO : Exception - " + e.Message);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Board를 Label, For_WebsiteId를 통해서 Create하는 함수
+        /// </summary>
+        /// <param name="req">
+        /// Label
+        /// </param>
+        /// <param name="req">
+        /// For_WebsiteId
+        /// </param>
+        /// <returns></returns>
+        public EnvelopeDTO<GenericDummyDTO> Any(BoardCreateRequestDTO req)
+        {
+            var Label = req.Label;
+            var For_WebsiteId = req.For_WebsiteId;
+
+            if(!For_WebsiteId.HasValue && !string.IsNullOrWhiteSpace(Label))
+            {
+                return Fail<GenericDummyDTO>("BoardCreateRequestDTO : parameter 'For_WebsiteId' is empty.");
+            }
+            if(For_WebsiteId.HasValue && string.IsNullOrWhiteSpace(Label))
+            {
+                return Fail<GenericDummyDTO>("BoardCreateRequestDTO : parameter 'For_WebsiteId' is empty.");
+            }
+            if(!For_WebsiteId.HasValue && string.IsNullOrWhiteSpace(Label))
+            {
+                return Fail<GenericDummyDTO>("BoardCreateRequestDTO : parameter 'For_WebsiteId' && 'Label' are empty.");
+            }
+            else
+            {
+                using (var entities = new CrawlerStorage())
+                {
+                    try
+                    {
+                        var board = new Board();
+                        board.Label = Label;
+                        board.For_WebsiteId = For_WebsiteId.Value;
+
+                        entities.Boards.Add(board);
+
+                        entities.SaveChanges();
+
+                        return Succeeded(new GenericDummyDTO());
+                    }
+                    catch (System.Data.Entity.Validation.DbEntityValidationException dbEx)
+                    {
+                        Exception raise = dbEx;
+                        foreach (var validationErrors in dbEx.EntityValidationErrors)
+                        {
+                            foreach (var validationError in validationErrors.ValidationErrors)
+                            {
+                                string message = string.Format("{0}:{1}",
+                                    validationErrors.Entry.Entity.ToString(),
+                                    validationError.ErrorMessage);
+                                raise = new InvalidOperationException(message, raise);
+                            }
+                        }
+                        throw raise;
+                    }
+                }
+            }
+        }
+    }
+}

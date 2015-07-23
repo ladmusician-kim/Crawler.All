@@ -1,0 +1,169 @@
+﻿namespace Crawler.Data.DbContext
+{
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
+    using System.ComponentModel.DataAnnotations.Schema;
+    using System.Data.Entity;
+    using System.Linq;
+    using System.Data.Entity.Validation;
+
+    public class CrawlerStorage : DbContext
+    {
+        // 컨텍스트가 응용 프로그램의 구성 파일(App.config 또는 Web.config)의 'CrawlerStorage' 연결 문자열을 
+        // 사용하도록 구성되었습니다. 기본적으로 이 연결 문자열은 LocalDb 인스턴스의  
+        // 'Crawler.Data.DbContext.CrawlerStorage' 데이터베이스를 대상으로 합니다. 
+        // 
+        // 다른 데이터베이스 및/또는 데이터베이스 공급자를 대상으로 할 경우 응용 프로그램 구성 파일에서 'CrawlerStorage' 
+        // 연결 문자열을 수정하십시오.
+        public CrawlerStorage(): base("name=CrawlerStorage")
+        {
+            var ensureDLLIsCopied = System.Data.Entity.SqlServer.SqlProviderServices.Instance;
+        }
+
+        // 모델에 포함할 각 엔터티 형식에 대한 DbSet을 추가합니다. Code First 모델 구성 및 사용에 대한 
+        // 자세한 내용은 http://go.microsoft.com/fwlink/?LinkId=390109를 참조하십시오.
+
+        public virtual DbSet<Board> Boards { get; set; }
+        public virtual DbSet<Content> Contents { get; set; }
+        public virtual DbSet<Snapshot> Snapshots { get; set; }
+        public virtual DbSet<SnapshotToContent> SnapshotToContents { get; set; }
+        public virtual DbSet<Srcdata> Srcdatas { get; set; }
+        public virtual DbSet<TimePeriod> TimePeriods { get; set; }
+        public virtual DbSet<Website> Websites { get; set; }
+    }
+    public class Website
+    {
+        [Key]
+        [Column("_websiteid")]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public int C_websiteid { get; set; }
+
+        [Required]
+        [StringLength(50)]
+        public string label { get; set; }
+
+        [Required]
+        public string website_url { get; set; }
+
+        [Required]
+        public string mobile_url { get; set; }
+
+        public virtual ICollection<Board> Boards { get; set; }
+
+        public virtual ICollection<Content> Contents { get; set; }
+    }
+
+    public class Board
+    {
+        [Key]
+        [Column("_boardid")]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public int C_boardid { get; set; }
+
+        public int for_websiteid { get; set; }
+
+        [Required]
+        [StringLength(50)]
+        public string label { get; set; }
+
+        public virtual Website Website { get; set; }
+
+        public virtual ICollection<Content> Contents { get; set; }
+    }
+
+    public class Content
+    {
+        [Key]
+        [Column("_contentguid")]
+        public Guid C_contentguid { get; set; }
+
+        public int for_websiteid { get; set; }
+
+        public int for_boardid { get; set; }
+
+        [Required]
+        public string contents_url { get; set; }
+
+        [Required]
+        public string article { get; set; }
+
+        public DateTime crawled { get; set; }
+
+        [Required]
+        public string details { get; set; }
+
+        [Required]
+        public string details_html { get; set; }
+
+        public virtual Board Board { get; set; }
+
+        public virtual Website Website { get; set; }
+
+        public virtual ICollection<Srcdata> Srcdatas { get; set; }
+    }
+    public class Snapshot
+    {
+        [Key]
+        [Column("_snapshotid")]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public int C_snapshotid { get; set; }
+
+        public int for_websiteid { get; set; }
+
+        public int for_timeperiod { get; set; }
+
+        public DateTime taken { get; set; }
+    }
+    public class SnapshotToContent
+    {
+        [Key]
+        [Column(Order = 0)]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public int for_snapshotid { get; set; }
+        public int In_WebsiteId { get; set; }
+
+        [Key]
+        [Column(Order = 1)]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public int seqno { get; set; }
+
+        [Key]
+        [Column(Order = 2)]
+        public Guid has_contentid { get; set; }
+    }
+    public class TimePeriod
+    {
+        [Key]
+        [Column("_timeperiodid")]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public int C_timeperiodid { get; set; }
+
+        [Required]
+        public string label { get; set; }
+
+        public DateTime scheduled { get; set; }
+
+        public DateTime crawled { get; set; }
+    }
+    public class Srcdata
+    {
+        [Key]
+        [Column("_srcid")]
+        public Guid C_srcid { get; set; }
+
+        public Guid for_contentid { get; set; }
+
+        [Required]
+        public string src { get; set; }
+
+        public virtual Content Content { get; set; }
+    }
+
+
+    //public class MyEntity
+    //{
+    //    public int Id { get; set; }
+    //    public string Name { get; set; }
+    //}
+}

@@ -1,0 +1,29 @@
+﻿'use strict';
+/* App Controllers */
+angular.module('crawlerApp.controllers')
+.controller('WebsiteDetailsCtrl', ['$scope', '$stateParams', 'Website', 'Board', 'Content', 'Snapshot', 'Srcdata', 'Timeperiod', function ($scope, $stateParams, Website, Board, Content, Snapshot, Srcdata, Timeperiod)
+{
+    $scope.boardId = $stateParams.websiteId;
+
+    Board.getBoard($scope.boardId, function (data) {
+        console.log("getBoard");
+        console.log(data);
+        $scope.board = data;
+        Website.getWebsite($scope.board.id, function (website) {
+            console.log("getWebsite");
+            console.log(website);
+            $scope.website = website;
+        })
+    }, function (msg) {
+        alret(msg);
+    });
+
+    $scope.websiteList = [];
+    Website.getWebsiteList(function (data) {
+        $scope.websiteList = data;
+        console.log("getWebsiteList");
+        console.log($scope.websiteList);
+    }, function (msg) {
+        alret(msg);
+    });
+}])

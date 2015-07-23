@@ -1,0 +1,222 @@
+﻿using Crawler.DTO.RequestDTO;
+using Crawler.DTO.ResponseDTO;
+using HtmlAgilityPack;
+using ServiceStack.ServiceClient.Web;
+using Sitecrawler.Core.Interface;
+using System.Collections.Generic;
+using System.Text;
+using System;
+using System.Text.RegularExpressions;
+using System.Net;
+using System.Threading.Tasks;
+using System.Linq;
+using Crawler.API.Helper;
+
+namespace Sitecrawler.Core.Code
+{
+    public abstract class commonCrawler : ICrawler
+    {
+        JsonServiceClient client;
+        protected SnapshotDTO Snapshot;
+
+        public commonCrawler()
+        {
+            try
+            {
+                client = new JsonServiceClient("http://localhost:61910");
+            }
+            catch (Exception e)
+            {
+
+            }
+        }
+        
+        protected abstract int perpage { get;}
+        
+        public void GetList(int count)
+        {
+            var pagecount = (int)((count - 1) / perpage);
+
+            var dic = new Dictionary<int, List<ContentRevisionDTO>>();
+
+            Parallel.For(1, pagecount + 2, i =>
+            {
+                var list = GetContentsPerPage(i);
+                Console.WriteLine(list == null);
+                dic.Add(i, list);
+            });
+
+            var orderedlist = dic.OrderBy(d => d.Key);
+            var finallist = new List<ContentRevisionDTO>();
+
+            foreach (var eachList in orderedlist)
+            {
+                finallist.AddRange(eachList.Value);
+            }
+                
+            Snapshot = new SnapshotDTO
+            {
+                ContentRevisions = finallist.Take(count).ToList(),
+
+            };
+        }
+        public SnapshotDTO Getsnapshot(int snapshotId)
+        {
+            var dto = client.Send<EnvelopeDTO<SnapshotDTO>>(new SnapshotGetbyIdRequestDTO
+            {
+                SnapshotId = snapshotId
+            });
+
+            return dto.SafeBody;
+        }
+        public SnapshotDTO GetsnapshotbyBoard(int boardid)
+        {
+            var dto = client.Send<EnvelopeDTO<SnapshotDTO>>(new SnapshotGetbyBoardIdRequestDTO
+            {
+                For_BoardId = boardid
+            });
+
+            return dto.SafeBody;
+        }
+        public SnapshotDTO SendSnapshot(List<ContentRevisionDTO> ContentRevisionList, int for_boardid)
+        {
+            //snapshot 저장 부분;
+            SnapshotDTO snapshot;
+            snapshot = new SnapshotDTO
+            {
+                For_Timeperiod = 1,
+                For_BoardId = for_boardid,
+                Taken = DateTime.Now,
+                ContentRevisions = ContentRevisionList
+            };
+
+            var dto = new SnapshotCreateRequestDTO
+            {
+                Snapshot = snapshot
+            };
+
+            client.Send<EnvelopeDTO<GenericDummyDTO>>(dto);
+
+            return dto.Snapshot;
+
+        }
+        public void CompareContent (int for_boardid , SnapshotDTO Snapshot)
+        {
+
+            var LastSnapshot = GetsnapshotbyBoard(for_boardid);
+            var CurrentSnapshot = Snapshot;
+
+            if (LastSnapshot != null)
+            {
+                foreach (var contentrevision in CurrentSnapshot.ContentRevisions)
+                {
+                    var checksumParams = contentrevision.Content.Url_Params;
+                    var checksum = Convert.ToBase64String(HashHelper.ObjectToMD5Hash(checksumParams));
+                    contentrevision.CheckSum = checksum;
+                    foreach (var Lastcontentrevision in LastSnapshot.ContentRevisions)
+                    {
+                        if (checksum.Equals(Lastcontentrevision.CheckSum))
+                        {
+                            contentrevision.Content = null; 
+                        }
+                    }
+                }
+                SendSnapshot(Snapshot.ContentRevisions, for_boardid);
+            }
+            else
+            {
+                foreach (var contentrevision in CurrentSnapshot.ContentRevisions)
+                {
+                    var checksumParams = contentrevision.Content.Url_Params;
+                    var checksum = Convert.ToBase64String(HashHelper.ObjectToMD5Hash(checksumParams));
+                    contentrevision.CheckSum = checksum;
+                }
+                SendSnapshot(Snapshot.ContentRevisions, for_boardid);
+            }
+
+        }
+        public SnapshotDTO SaveSnapshot(SnapshotDTO snapshot)
+        {
+            var dto = client.Send<EnvelopeDTO<SnapshotDTO>>(new SnapshotCreateRequestDTO
+            {
+                Snapshot = snapshot
+            });
+
+            return dto.SafeBody;
+        }
+        protected abstract List<ContentRevisionDTO> GetContentsPerPage(int page);
+
+        public void ParseArticles()
+        {
+            var for_boardid = 0;
+            if (Snapshot.ContentRevisions != null)
+            {
+                Parallel.ForEach(Snapshot.ContentRevisions, contentrevision =>
+                {
+                    ParseContent(contentrevision);
+                    CacheImage(contentrevision.Content);
+                    for_boardid = contentrevision.For_BoardId;
+                });
+            }
+            CompareContent(for_boardid, Snapshot);
+        }
+
+
+        public SnapshotDTO getSnapshot(int snapshotId)
+        {
+            var dto = client.Send<EnvelopeDTO<SnapshotDTO>>(new SnapshotGetbyIdRequestDTO
+            {
+                SnapshotId = snapshotId
+            });
+            
+            return dto.SafeBody;
+        }
+
+        protected abstract void ParseContent(ContentRevisionDTO contentrevision);
+
+         
+         
+         
+        protected void CacheImage(ContentDTO Content)
+        {
+            try
+            {
+                if (Content.SrcDatas != null)
+                {
+                    Parallel.ForEach(Content.SrcDatas, srcdata =>
+                    {
+                        var client = new WebClient();
+                        //System.Console.WriteLine(content.Contents_URL);
+                        client.Headers.Add("Referer", Content.Contents_URL);
+                        var data = client.DownloadData(srcdata.SourceUrl);
+
+                        srcdata.OriginalPayload = data;
+                    });
+                }
+            }
+            catch (WebException wex)
+            {
+                if (((HttpWebResponse)wex.Response).StatusCode == HttpStatusCode.NotFound)
+                {
+                    // error 404, do what you need to do
+                }
+            }
+        }
+
+        //공통으로 쓰이는 변수
+        public HtmlWeb webGetkr = new HtmlWeb
+        {
+            UserAgent = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_3_2 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8H7 Safari/6533.18.5",
+            OverrideEncoding = Encoding.GetEncoding("euc-kr")
+        };
+        
+        public HtmlWeb webGetutf = new HtmlWeb
+        {
+            UserAgent = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_3_2 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8H7 Safari/6533.18.5",
+            OverrideEncoding = Encoding.GetEncoding("UTF-8")
+        };
+        
+        //Icrawler 에서 상속받은 부분
+       
+    }
+}

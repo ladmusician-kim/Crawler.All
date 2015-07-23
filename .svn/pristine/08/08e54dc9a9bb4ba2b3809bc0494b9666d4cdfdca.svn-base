@@ -1,0 +1,231 @@
+﻿using Sitecrawler.Core.Interface;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HtmlAgilityPack;
+using Crawler.Data.DbContext;
+using System.Text.RegularExpressions;
+using Crawler.DTO.ResponseDTO;
+
+namespace Sitecrawler.Core.Code
+{
+    public class mparkCrawler : commonCrawler
+    {
+        // Icrawler로 부터 상속 받은 부분
+        public override bool Login(string Username, string Password)
+        {
+            return true;
+        }
+
+        public override void UpdateRecentArticles(int boardid)
+        {
+        }
+
+        public override void Noop()
+        {
+
+        }
+
+        public override void ParseComment()
+        {
+
+        }
+
+        public override void ParseClickNum()
+        {
+
+        }
+
+        public override void ParseLikeNum()
+        {
+
+        }
+        public override void Run()
+        {
+            //commonCrawler로 부터 상속받은 부분
+            //엠팍
+            var mlbpark = webGetkr.Load("http://mlbpark.donga.com/mbs/articleL.php?mbsC=mlbtown");
+            System.Console.WriteLine("엠팍");
+            var mlbpark_datecount = 0;
+
+            //content_guid를 저장하는 List
+            List<int> contentList = new List<int>();
+
+            foreach (var mlbpark_div in mlbpark.DocumentNode.SelectNodes("//div[@class= 'news_list']"))
+            {
+                foreach (var mlbpark_ul in mlbpark_div.Descendants().Where(p => p.GetAttributeValue("id", "dd") == "mNewsList"))
+                {
+                    foreach (var mlbpark_a in mlbpark_ul.Descendants())
+                    {
+                        foreach(var mlbpark_li in mlbpark_a.DescendantNodes())
+                        {
+                            if (mlbpark_li.Name == "a")
+                            {
+                                var content = new ContentDTO();
+                                var article = "";
+                                DateTime time = DateTime.Now;
+                                // 글 제목 (article)를 받아오는 곳
+                                foreach (var mlbpark_article in mlbpark_a.Descendants().Where(p => p.GetAttributeValue("class", "dd") == "t"))
+                                {
+                                    foreach (var mlbpark_title in mlbpark_article.Descendants())
+                                    {
+                                        foreach (var mlbpark_em in mlbpark_title.SelectNodes("//strong"))
+                                        {
+                                            System.Console.WriteLine(mlbpark_em.InnerText.Trim());
+
+                                            if (mlbpark_em.InnerText.Trim() != null)
+                                            {
+                                                if (mlbpark_em.InnerText.Trim() == "")
+                                                {
+                                                    article = "내용 없음";
+                                                }
+                                                else
+                                                {
+                                                    article = (mlbpark_em.InnerText.Trim());
+                                                }
+                                            }
+                                            else
+                                            {
+                                                article = "내용 없음";
+                                            }
+                                        }
+                                        foreach (var mlbpark_em in mlbpark_title.SelectNodes("//em"))
+                                        {
+                                            foreach (var mlbpark_span in mlbpark_em.Descendants())
+                                            {
+                                                mlbpark_datecount++;
+                                                if (mlbpark_datecount < 3)
+                                                {
+                                                    mlbpark_span.InnerHtml = "";
+                                                }
+                                                else
+                                                {
+                                                    mlbpark_datecount = 0;
+                                                }
+                                            }
+                                        }
+                                        if (mlbpark_title.Name == "em")
+                                        {
+                                            var mlbpark_time = mlbpark_title.InnerText.Trim();
+                                            System.Console.WriteLine(mlbpark_time);
+                                            string timestring = mlbpark_title.InnerText.Trim();
+
+                                            time = Convert.ToDateTime(timestring);
+                                        }
+                                    }
+                                }
+
+                                HtmlAttribute mlbpark_url = mlbpark_a.Attributes["href"];
+                                System.Console.Write("http://mlbpark.donga.com/" + mlbpark_url.Value + " ");
+
+                                var url = ("http://mlbpark.donga.com/" + mlbpark_url.Value);
+
+                                //안의 내용을 가져오는 함수 실행.
+                                var innerArticle = RunContent(url);
+
+                                var details = "";
+                                var details_html = "";
+                                List<SrcdataDTO> SrcDatas = new List<SrcdataDTO>();
+
+                                //안의 내용
+                                if (innerArticle.First() != "")
+                                {
+                                    //details 저장
+                                    details = innerArticle.First();
+                                }
+                                else
+                                {
+                                    details = "내용이 없습니다.";
+                                }
+                                //안의 내용의 html
+                                if (innerArticle[1] != "")
+                                {
+                                    //details_html 저장
+                                    details_html = innerArticle[1];
+                                    SrcDatas = ParseSrc(details_html);
+                                }
+
+                                content = new ContentDTO
+                                {
+                                    Crawled = time,
+                                    For_BoardId = 7,
+                                    Contents_URL = url,
+                                    Article = article,
+                                    Details = details,
+                                    Details_Html = details_html,
+                                    SrcDatas = SrcDatas
+                                };
+                                if (content.C_ContentGuId != null && content.For_BoardId != null && content.Article != null && content.Contents_URL != null && content.Crawled != null && content.Details != null && content.Details_Html != null)
+                                {
+                                    SendContent(content);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            //var snapshot = new Snapshot();
+            //snapshot.C_SnapshotId = entities.Snapshots.Count() + 1;
+            //snapshot.For_WebsiteId = 7;
+            //snapshot.For_Timeperiod = 1;
+            //snapshot.Taken = DateTime.Now;
+
+            //if (snapshot.C_SnapshotId != null && snapshot.For_WebsiteId != null && snapshot.For_Timeperiod != null && snapshot.Taken != null)
+            //{
+            //    entities.Snapshots.Add(snapshot);
+            //}
+
+            //int contentSeq = 0;
+            //foreach (var content in contentList)
+            //{
+            //    var snapshotTocontent = new SnapshotToContent();
+            //    contentSeq++;
+            //    snapshotTocontent.For_SnapshotId = snapshot.C_SnapshotId;
+            //    snapshotTocontent.Has_ContentId = content;
+            //    snapshotTocontent.Seqno = contentSeq;
+
+            //    if (snapshotTocontent.For_SnapshotId != null && snapshotTocontent.Has_ContentId != null && snapshotTocontent.Seqno != null)
+            //    {
+            //        entities.SnapshotToContents.Add(snapshotTocontent);
+            //    }
+            //}
+            //entities.SaveChanges();
+        }
+        public List<string> RunContent(string url)
+        {
+            var mparkContents = webGetkr.Load(url);
+            //var content_count = 0;
+            List<string> details = new List<string>();
+            if(mparkContents.DocumentNode.SelectNodes("//div[@class = 'article']") != null)
+            {
+                foreach (var content in mparkContents.DocumentNode.SelectNodes("//div[@class = 'article']"))
+                {
+                    foreach (var ct in content.Descendants())
+                    {
+                        if (ct.Name == "style")
+                        {
+                            ct.InnerHtml = "";
+                        }
+                    }
+
+                    System.Console.WriteLine("-------------------------------------------------------------------------------");
+                    System.Console.WriteLine("내용");
+                    string input = content.InnerText.Trim();
+                    string input2 = content.InnerHtml.Trim();
+                    System.Console.WriteLine(input);
+                    System.Console.WriteLine(input2);
+                    details.Add(input);
+                    details.Add(input2);
+                }
+            }
+            else
+            {
+                details.Add("내용 없음");
+                details.Add("내용 없음");
+            }
+            return details;
+        }
+    }
+}

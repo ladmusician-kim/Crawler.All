@@ -1,0 +1,15 @@
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\bin\Release\Crawler.ClientWPF.exe.config
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\bin\Release\Crawler.ClientWPF.exe
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\bin\Release\Crawler.ClientWPF.pdb
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\obj\Release\Crawler.ClientWPF.csprojResolveAssemblyReference.cache
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\obj\Release\MainWindow.baml
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\obj\Release\MainWindow.g.cs
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\obj\Release\App.g.cs
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\obj\Release\Crawler.ClientWPF_MarkupCompile.cache
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\obj\Release\Crawler.ClientWPF.g.resources
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\obj\Release\Crawler.ClientWPF.Properties.Resources.resources
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\obj\Release\Crawler.ClientWPF.csproj.GenerateResource.Cache
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\obj\Release\Crawler.ClientWPF.exe
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\obj\Release\Crawler.ClientWPF.pdb
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\bin\Release\MoreLinq.Portable.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.ClientWPF\bin\Release\MoreLinq.Portable.xml

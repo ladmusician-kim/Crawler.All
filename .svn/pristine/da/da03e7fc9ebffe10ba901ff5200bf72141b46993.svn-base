@@ -1,0 +1,23 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Crawler.DTO.RequestDTO
+{
+    public class ContentCreateRequestDTO
+    {
+        public int for_websiteid { get; set; }
+        public int for_boardid { get; set; }
+        public string article { get; set; }
+        public string crawled { get; set; }
+        public DateTime datetime { get; set; }
+        public string details { get; set; }
+        public string details_html { get; set; }
+    }
+    public class ContentGetRequestDTO
+    {
+        public Guid _contentguid { get; set; }
+    }
+}

@@ -1,0 +1,191 @@
+﻿using Crawler.Data.DbContext;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HtmlAgilityPack;
+using System.Text.RegularExpressions;
+using Crawler.DTO.ResponseDTO;
+
+namespace Sitecrawler.Core.Code
+{
+    public class ruiwebCrawler : commonCrawler
+    {
+        // Icrawler로 부터 상속 받은 부분
+        public override bool Login(string Username, string Password)
+        {
+            return true;
+        }
+
+        public override void UpdateRecentArticles(int boardid)
+        {
+        }
+
+        public override void Noop()
+        {
+
+        }
+
+        public override void ParseComment()
+        {
+
+        }
+
+        public override void ParseClickNum()
+        {
+
+        }
+
+        public override void ParseLikeNum()
+        {
+
+        }
+
+        public override void StartCrawl()
+        {
+
+        }
+
+        public override void LoadImages()
+        {
+
+        }
+
+        public override void GetContents()
+        {
+
+        }
+
+        public override void DownloadImages()
+        {
+
+        }
+
+        public override void SendSnapshot()
+        {
+
+        }
+        public override void Run()
+        {
+            List<ContentDTO> contentList = new List<ContentDTO>();
+            List<int> snapTocontentList = new List<int>();
+            
+            //commonCrawler로 부터 상속받은 부분
+            //루리웹
+            System.Console.WriteLine("루리웹");
+
+            var ruiweb = webGetutf.Load("http://bbs2.ruliweb.daum.net/gaia/do/ruliweb/default/community/322/list?bbsId=G005&pageIndex=1&itemId=141");
+            var ruiweb_articlescount = 0;
+            var ruiweb_timecount = 0;
+
+            foreach (var ruiweb_tr in ruiweb.DocumentNode.SelectNodes("//tr"))
+            {
+                var content = new ContentDTO();
+                var article = "";
+                DateTime time = DateTime.Now;
+
+                foreach (var ruiweb_time1 in ruiweb_tr.Descendants().Where(p => p.GetAttributeValue("class", "dd") == "time"))
+                {
+                    foreach (var ruiweb_time in ruiweb_time1.Descendants())
+                    {
+                        ruiweb_timecount++;
+                        if (ruiweb_timecount > 1)
+                        {
+                            System.Console.WriteLine(ruiweb_time.InnerText.Trim());
+                            string timestring = ruiweb_time.InnerText.Trim();
+                            time = Convert.ToDateTime(timestring);
+                        }
+                    }
+                }
+                foreach (var ruiweb_subject in ruiweb_tr.Descendants().Where(p => p.GetAttributeValue("class", "dd") == "subject"))
+                {
+                    foreach (var ruiweb_article in ruiweb_subject.Descendants())
+                    {
+                        if (ruiweb_article.Name == "a")
+                        {
+                            ruiweb_articlescount++;
+                            if (ruiweb_articlescount > 1)
+                            {
+                                System.Console.Write(ruiweb_article.InnerText.Trim() + " ");
+                                //Db -> content/article 에 저장하는 부분
+                                article = (ruiweb_article.InnerText.Trim());
+
+                                HtmlAttribute ruiweb_url = ruiweb_article.Attributes["href"];
+
+                                System.Console.Write("http://bbs2.ruliweb.daum.net/gaia/do/ruliweb/default/community/322/" + ruiweb_url.Value + " ");
+                                //Db -> content/contents_url에 저장하는 부분
+                                var url = ("http://bbs2.ruliweb.daum.net/gaia/do/ruliweb/default/community/322/" + ruiweb_url.Value);
+
+                                //안의 내용을 가져오는 함수 실행.
+                                var innerArticle = RunContent(url);
+
+                                var details = "";
+                                var details_html = "";
+                                List<SrcdataDTO> SrcDatas = new List<SrcdataDTO>();
+
+                                //안의 내용
+                                if (innerArticle.First() != "")
+                                {
+                                    //details 저장
+                                    details = innerArticle.First();
+                                }
+                                else
+                                {
+                                    details = "내용이 없습니다.";
+                                }
+
+                                //안의 내용의 html
+                                if (innerArticle[1] != "")
+                                {
+                                    //details_html 저장
+                                    details_html = innerArticle[1];
+                                    SrcDatas = ParseSrc(details_html);
+                                }
+
+                                contentList.Add(new ContentDTO
+                                {
+                                    Crawled = time,
+                                    Contents_URL = url,
+                                    Article = article,
+                                    Details = details,
+                                    Details_Html = details_html,
+                                    SrcDatas = SrcDatas
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            SendSnapshot(contentList, 1);
+        }
+
+        
+        public List<string> RunContent(string url)
+        {
+            var ruiwebContents = webGetutf.Load(url);
+            var content_count = 0;
+            List<string> details = new List<string>();
+            foreach (var div in ruiwebContents.DocumentNode.SelectNodes("//div"))
+            {
+                foreach(var table in div.Descendants().Where(p => p.GetAttributeValue("class","dd") == "read_cont_table"))
+                {
+                    foreach (var content in table.Descendants().Where(p => p.GetAttributeValue("class", "dd") == "tx-content-container read_cont_td"))
+                    {
+                        content_count++;
+                        if(content_count == 1)
+                        {
+                            System.Console.WriteLine("-------------------------------------------------------------------------------");
+                            System.Console.WriteLine("내용");
+                            System.Console.WriteLine(content.InnerText.Trim());
+                            System.Console.WriteLine(content.InnerHtml);
+                            details.Add(content.InnerText);
+                            details.Add(content.InnerHtml);
+                        }
+                    }
+                }
+            }
+            return details;
+        }
+    }
+}

@@ -1,0 +1,224 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HtmlAgilityPack;
+using Crawler.Data.DbContext;
+using System.Text.RegularExpressions;
+
+namespace Sitecrawler.Core.Code
+{
+    public class bobaedreamCrawler : commonCrawler
+    {
+        public override void Run()
+        {
+            var entities = new CrawlerStorage();
+            
+            //commonCrawler로 부터 상속받은 부분
+            //보배드림
+            var bobaedream = webGetutf.Load("http://m.bobaedream.co.kr/board/new_writing/freeb");
+            System.Console.WriteLine("보배드림");
+            var src_Count = 0;
+
+            //content_guid를 저장하는 List
+            List<Guid> contentList = new List<Guid>();
+
+            foreach (var bobaedream_ul in bobaedream.DocumentNode.SelectNodes("//ul[@class= 'list02']"))
+            {
+                foreach (var bobaedream_li in bobaedream_ul.Descendants())
+                {
+                    foreach (var bobaedream_a in bobaedream_li.Descendants())
+                    {
+                        if (bobaedream_a.Name == "a")
+                        {
+                            var content = new Content();
+                            foreach (var bobaedream_time in bobaedream_a.Descendants().Where(p => p.GetAttributeValue("class", "dd") == "numEng"))
+                            {
+                                System.Console.WriteLine(bobaedream_time.InnerText.Trim());
+                                timeList.Add(bobaedream_time.InnerText.Trim());
+
+                                string time = bobaedream_time.InnerText.Trim();
+                                DateTime c_time = Convert.ToDateTime(time);
+
+                                //Db -> content/crawled(글 등록 시간) 에 저장하는 부분
+                                content.crawled = c_time;
+                                //Db -> content/for_boardid 에 저장하는 부분
+                                content.for_boardid = 1;
+                                //Db -> content/for_websiteid 에 저장하는 부분
+                                content.for_websiteid = 2;
+                                //Db -> content/_contentguid 에 저장하는 부분
+                                content.C_contentguid = Guid.NewGuid();
+                                //content_guid를 저장하는 부분
+                                contentList.Add(content.C_contentguid);
+                            }
+
+                            HtmlAttribute bobaedream_url = bobaedream_a.Attributes["href"];
+
+                            System.Console.Write("http://m.bobaedream.co.kr" + bobaedream_url.Value + " ");
+                            content.contents_url = ("http://m.bobaedream.co.kr" + bobaedream_url.Value + " ");
+
+                            foreach (var bobaedream_article in bobaedream_a.Descendants().Where(p => p.GetAttributeValue("class", "dd") == "text"))
+                            {
+                                System.Console.Write(bobaedream_article.InnerText.Trim() + " ");
+                                articleList.Add(bobaedream_article.InnerText.Trim() + " ");
+
+                                content.article = (bobaedream_article.InnerText.Trim() + " ");
+                            }
+
+                            //안의 내용을 가져오는 함수 실행.
+                            var details = RunContent("http://m.bobaedream.co.kr" + bobaedream_url.Value + " ");
+
+                            //안의 내용
+                            if (details.First() != "")
+                            {
+                                content.details = details.First();
+                            }
+                            else
+                            {
+                                content.details = "내용 없음";
+                            }
+                            //안의 내용의 html
+                            if (details[1] != "")
+                            {
+                                content.details_html = details[1];
+                                
+                                string input_src = details[1];
+                                string pattern_src = "src=[\"'](.+?)[\"'].*?>";
+                                if(Regex.Matches(input_src, pattern_src).Count > 0)
+                                {
+                                    foreach (Match m in Regex.Matches(input_src, pattern_src))
+                                    {
+                                        var srcdata = new Srcdata();
+                                        System.Console.WriteLine("-------------------------------------------------------------------------------");
+                                        System.Console.WriteLine(m.Value);
+                                        srcdata.C_srcid = Guid.NewGuid();
+                                        srcdata.for_contentid = content.C_contentguid;
+                                        srcdata.src = m.Value;
+                                        if(srcdata.C_srcid != null && srcdata.for_contentid != null && srcdata.src != null)
+                                        {
+                                            src_Count++;
+                                            entities.Srcdatas.Add(srcdata);
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                content.details = "내용 없음";
+                            }
+                            if (content.article != null && content.contents_url != null && content.crawled != null && content.details != null && content.details_html != null)
+                            {
+                                entities.Contents.Add(content);
+                            }
+                        }
+                    }
+                }
+            }
+
+            var snapshot = new Snapshot();
+            snapshot.C_snapshotid = entities.Snapshots.Count() + 1;
+            snapshot.for_websiteid = 2;
+            snapshot.for_timeperiod = 1;
+            snapshot.taken = DateTime.Now;
+
+            if (snapshot.C_snapshotid != null && snapshot.for_websiteid != null && snapshot.for_timeperiod != null && snapshot.taken != null)
+            {
+                entities.Snapshots.Add(snapshot);
+            }
+
+            int contentSeq = 0;
+            foreach (var content in contentList)
+            {
+                var snapshotTocontent = new SnapshotToContent();
+                contentSeq++;
+                snapshotTocontent.for_snapshotid = snapshot.C_snapshotid;
+                snapshotTocontent.has_contentid = content;
+                snapshotTocontent.seqno = contentSeq;
+
+                if (snapshotTocontent.for_snapshotid != null && snapshotTocontent.has_contentid != null && snapshotTocontent.seqno != null)
+                {
+                    entities.SnapshotToContents.Add(snapshotTocontent);
+                }
+            }
+            entities.SaveChanges();
+        }
+        //content 내용, html 가져오는 함수
+        public List<string> RunContent(string url)
+        {
+            var ruiwebContents = webGetutf.Load(url);
+            //var content_count = 0;
+            List<string> details = new List<string>();
+            foreach (var content in ruiwebContents.DocumentNode.SelectNodes("//div[@id = 'body_frame']"))
+            {
+
+                foreach(var ct in content.Descendants())
+                {
+                    if(ct.Name == "style")
+                    {
+                        ct.InnerHtml = "";
+                    }
+                }
+
+                System.Console.WriteLine("-------------------------------------------------------------------------------");
+                System.Console.WriteLine("내용");
+
+                System.Console.WriteLine(content.InnerText.Trim());
+                System.Console.WriteLine(content.InnerHtml.Trim());
+                
+                details.Add(content.InnerText);
+                details.Add(content.InnerHtml);
+                
+                
+                /*foreach (var table in div.Descendants().Where(p => p.GetAttributeValue("class", "dd") == "read_cont_table"))
+                {
+                    foreach (var content in table.Descendants().Where(p => p.GetAttributeValue("class", "dd") == "tx-content-container read_cont_td"))
+                    {
+                        content_count++;
+                        if (content_count == 1)
+                        {
+                            System.Console.WriteLine("-------------------------------------------------------------------------------");
+                            System.Console.WriteLine("내용");
+                            System.Console.WriteLine(content.InnerText.Trim());
+                            System.Console.WriteLine(content.InnerHtml);
+                            details.Add(content.InnerText);
+                            details.Add(content.InnerHtml);
+                        }
+                    }
+                }*/
+            }
+            return details;
+        }
+        
+
+        //Icrawler로 부터 상속받은 부분
+        public override bool Login(string Username, string Password)
+        {
+            return true;
+        }
+
+        public override void UpdateRecentArticles(int boardid)
+        {
+        }
+
+        public override void Noop()
+        {
+
+        }
+
+        public override void ParseComment()
+        {
+
+        }
+
+        public override void ParseClickNum()
+        {
+
+        }
+
+        public override void ParseLikeNum()
+        {
+
+        }
+    }
+}

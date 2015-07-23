@@ -1,0 +1,55 @@
+﻿<div class="row" ng-controller="DatepageCtrl">
+    <div style="padding:15px;">
+        <div class="btn-group" style="width:100%; display: table; border-collapse: separate; table-layout: fixed;">
+            <label style="display: table-cell; float: none; width: 1%;" ng-repeat="website in websiteList" class="btn btn-primary" ng ng-model="radioModel" btn-radio="'website.label'" ng-click="addBoard(website.id)">{{website.label}}</label>
+        </div>
+    </div>
+
+    <div style="margin-top:10px;">
+        <div class="col-md-5">
+            <p class="input-group">
+                <input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="startDate" is-open="formDates.startdate" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" />
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-default" ng-click="open($event, 'startdate')"><i class="glyphicon glyphicon-calendar"></i></button>
+                </span>
+            </p>
+        </div>
+        <div class="col-md-5">
+            <p class="input-group">
+                <input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="endDate" is-open="formDates.enddate"  datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" />
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-default" ng-click="open($event, 'enddate')"><i class="glyphicon glyphicon-calendar"></i></button>
+                </span>
+            </p>
+        </div>
+        <div class="col-md-2">
+            <button type="button" class="btn btn-success" ng-click="DateSearch()">
+                검색
+            </button>
+        </div>
+    </div>
+
+    <div class="col-md-4" ng-repeat="selectedBoard in selectedBoardList" ng-show="isShowResult">
+        <div class="panel panel-default">
+            <table class="table table-striped table-hover table-condensed">
+                <tbody>
+                    <tr ng-repeat="ContentRevisionSearch in ContentRevisionListSearchResultList" ng-if="ContentRevisionListSearchResultList.length != 0">
+                        <td class="col-md-9">
+                            <a href={{ContentRevisionSearch.content.contents_URL}} style="font-weight:bold; padding:10px;">
+                                {{ContentRevisionSearch.content.article}}
+                            </a>
+                        </td>
+                        <td class="col-md-3">
+                            <small>{{ContentRevisionSearch.crawled}}</small>
+                        </td>
+                    </tr>
+                    <tr ng-if="ContentRevisionListSearchResultList.length == 0">
+                        <td class="col-md-9">
+                            검색 결과가 없습니다.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

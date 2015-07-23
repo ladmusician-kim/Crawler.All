@@ -1,0 +1,110 @@
+﻿using Crawler.Data.DbContext;
+using Crawler.DTO.RequestDTO;
+using Crawler.DTO.ResponseDTO;
+using ServiceStack.ServiceClient.Web;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Crawler.API.ServiceCode
+{
+    public partial class CrawlerService : ServiceBase
+    {
+        public EnvelopeDTO<GenericDummyDTO> Any(ContentCreateRequestDTO req)
+        {
+            var Content = req.Content;
+            List<SrcdataDTO> SrcdataList = new List<SrcdataDTO>(); 
+
+            using (var entities = new CrawlerStorage())
+            {
+                try
+                {
+                    var content = new Content();
+                    
+                    content.For_BoardId = Content.For_BoardId;
+                    content.Contents_URL = Content.Contents_URL;
+                    content.Article = Content.Article;
+                    content.Crawled = Content.Crawled;
+                    content.Details = Content.Details;
+                    content.Details_Html = Content.Details_Html;
+                    content.C_ContentGuId = Guid.NewGuid();
+
+                    entities.Contents.Add(content);
+
+                    foreach(var data in Content.SrcDatas)
+                    {
+                        var srcdata = new Srcdata(); 
+                        srcdata.C_SrcId = Guid.NewGuid();
+                        srcdata.Src = data.Src;
+                        srcdata.Content = content;
+
+                        entities.Srcdatas.Add(srcdata);
+                    }
+
+                    entities.SaveChanges();
+                    return Succeeded(new GenericDummyDTO());
+                }
+                catch (System.Data.Entity.Validation.DbEntityValidationException dbEx)
+                {
+                    Exception raise = dbEx;
+                    foreach (var validationErrors in dbEx.EntityValidationErrors)
+                    {
+                        foreach (var validationError in validationErrors.ValidationErrors)
+                        {
+                            string message = string.Format("{0}:{1}",
+                                validationErrors.Entry.Entity.ToString(),
+                                validationError.ErrorMessage);
+                            // raise a new exception nesting
+                            // the current instance as InnerException
+                            raise = new InvalidOperationException(message, raise);
+                        }
+                    }
+                    throw raise;
+                }
+            }
+        }
+        public EnvelopeDTO<ContentDTO> Any(ContentGetbyIdRequestDTO req)
+        {
+            var contentId = req.Id;
+
+            if (contentId == null)
+            {
+                return Fail<ContentDTO>("ContentGetbyIdRequestDTO : parameter 'contentId' is empty.");
+            }
+
+            using (var entities = new CrawlerStorage())
+            {
+                try
+                {           
+                    var content = (from c in entities.Contents
+                                 where c.Id == contentId
+                                 select new ContentDTO
+                                 {
+                                     Id = c.Id,
+                                     ContentGuId = c.C_ContentGuId,
+                                     Article = c.Article,
+                                     Contents_URL = c.Contents_URL,
+                                     Crawled = c.Crawled,
+                                     Details = c.Details,
+                                     Details_Html = c.Details_Html,
+                                     For_BoardId = c.For_BoardId,
+                                 
+                                 }).SingleOrDefault();
+                    
+                    if (content == null)
+                    {
+                        return Fail<ContentDTO>("ContentGetbyIdRequestDTO : Website matching given 'contentId' does not exist.");
+                    }
+                    
+                    return Succeeded(content);
+                }
+
+                catch (Exception e)
+                {
+                    return Fail<ContentDTO>("ContentGetbyIdRequestDTO : Exception - " + e.Message);
+                }
+            }
+        }
+    }
+}

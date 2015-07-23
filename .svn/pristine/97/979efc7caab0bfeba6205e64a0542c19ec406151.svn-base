@@ -1,0 +1,210 @@
+﻿using Crawler.Data.DbContext;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HtmlAgilityPack;
+using System.Text.RegularExpressions;
+
+namespace Sitecrawler.Core.Code
+{
+    public class ruiwebCrawler : commonCrawler
+    {
+        // Icrawler로 부터 상속 받은 부분
+        public override bool Login(string Username, string Password)
+        {
+            return true;
+        }
+
+        public override void UpdateRecentArticles(int boardid)
+        {
+        }
+
+        public override void Noop()
+        {
+
+        }
+
+        public override void ParseComment()
+        {
+
+        }
+
+        public override void ParseClickNum()
+        {
+
+        }
+
+        public override void ParseLikeNum()
+        {
+
+        }
+        public override void Run()
+        {
+            var entities = new CrawlerStorage();
+            //commonCrawler로 부터 상속받은 부분
+            //루리웹
+            System.Console.WriteLine("루리웹");
+
+            var ruiweb = webGetutf.Load("http://bbs2.ruliweb.daum.net/gaia/do/ruliweb/default/community/322/list?bbsId=G005&pageIndex=1&itemId=141");
+            var ruiweb_articlescount = 0;
+            var ruiweb_timecount = 0;
+            
+            //content_guid를 저장하는 List
+            List<Guid> contentList = new List<Guid>();
+
+            foreach (var ruiweb_tr in ruiweb.DocumentNode.SelectNodes("//tr"))
+            {
+                var content = new Content();
+                foreach (var ruiweb_time1 in ruiweb_tr.Descendants().Where(p => p.GetAttributeValue("class", "dd") == "time"))
+                {
+                    foreach (var ruiweb_time in ruiweb_time1.Descendants())
+                    {
+                        ruiweb_timecount++;
+                        if (ruiweb_timecount > 1)
+                        {
+                            System.Console.WriteLine(ruiweb_time.InnerText.Trim());
+                            string time = ruiweb_time.InnerText.Trim();
+                            DateTime c_time = Convert.ToDateTime(time);
+
+                            //Db -> content/crawled(글 등록 시간) 에 저장하는 부분
+                            content.crawled = c_time;
+                            //Db -> content/for_boardid 에 저장하는 부분
+                            content.for_boardid = 1;
+                            //Db -> content/for_websiteid 에 저장하는 부분
+                            content.for_websiteid = 1;
+                            //Db -> content/_contentguid 에 저장하는 부분
+                            content.C_contentguid = Guid.NewGuid();
+
+                            //content_guid를 저장하는 부분
+                            contentList.Add(content.C_contentguid);
+                        }
+                    }
+                }
+                foreach (var ruiweb_subject in ruiweb_tr.Descendants().Where(p => p.GetAttributeValue("class", "dd") == "subject"))
+                {   
+                    foreach (var ruiweb_article in ruiweb_subject.Descendants())
+                    {
+                        if (ruiweb_article.Name == "a")
+                        {
+                            ruiweb_articlescount++;
+                            if (ruiweb_articlescount > 1)
+                            {
+                                HtmlAttribute ruiweb_url = ruiweb_article.Attributes["href"];
+                                
+                                System.Console.Write("http://bbs2.ruliweb.daum.net/gaia/do/ruliweb/default/community/322/" + ruiweb_url.Value + " ");
+                                //Db -> content/contents_url에 저장하는 부분
+                                content.contents_url = ("http://bbs2.ruliweb.daum.net/gaia/do/ruliweb/default/community/322/" + ruiweb_url.Value + " ");
+
+                                //안의 내용을 가져오는 함수 실행.
+                                var details = RunContent("http://bbs2.ruliweb.daum.net/gaia/do/ruliweb/default/community/322/" + ruiweb_url.Value);
+                                
+                                //안의 내용
+                                if(details.First() != "")
+                                {
+                                    content.details = details.First();
+                                }
+                                else
+                                {
+                                    content.details = "내용 없음";
+                                }
+                                //안의 내용의 html
+                                if (details[1] != "")
+                                {
+                                    content.details_html = details[1];
+
+                                    string input_src = details[1];
+                                    string pattern_src = "src=[\"'](.+?)[\"'].*?>";
+                                    if (Regex.Matches(input_src, pattern_src).Count > 0)
+                                    {
+                                        foreach (Match m in Regex.Matches(input_src, pattern_src))
+                                        {
+                                            var srcdata = new Srcdata();
+                                            System.Console.WriteLine("-------------------------------------------------------------------------------");
+                                            System.Console.WriteLine(m.Value);
+                                            srcdata.C_srcid = Guid.NewGuid();
+                                            srcdata.for_contentid = content.C_contentguid;
+                                            srcdata.src = m.Value;
+                                            if (srcdata.C_srcid != null && srcdata.for_contentid != null && srcdata.src != null)
+                                            {
+                                                entities.Srcdatas.Add(srcdata);
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    content.details = "내용 없음";
+                                }
+
+                                System.Console.Write(ruiweb_article.InnerText.Trim() + " ");
+                                //Db -> content/article 에 저장하는 부분
+                                content.article = (ruiweb_article.InnerText.Trim() + " ");
+                            }
+                        }
+                    }
+                }
+                if (content.article != null && content.contents_url != null && content.crawled != null && content.details != null && content.details_html != null)
+                {
+                    entities.Contents.Add(content);
+                }
+            }
+            
+            var snapshot = new Snapshot();
+            snapshot.C_snapshotid = entities.Snapshots.Count() + 1;
+            snapshot.for_websiteid = 1;
+            snapshot.for_timeperiod = 1;
+            snapshot.taken = DateTime.Now;
+
+            if (snapshot.C_snapshotid != null && snapshot.for_websiteid != null && snapshot.for_timeperiod != null && snapshot.taken != null)
+            {
+                entities.Snapshots.Add(snapshot);
+            }
+            
+            int contentSeq = 0;
+            foreach(var content in contentList)
+            {
+                var snapshotTocontent = new SnapshotToContent();
+                contentSeq++;
+                snapshotTocontent.for_snapshotid = snapshot.C_snapshotid;
+                snapshotTocontent.has_contentid = content;
+                snapshotTocontent.seqno = contentSeq;
+                
+                if (snapshotTocontent.for_snapshotid != null && snapshotTocontent.has_contentid != null && snapshotTocontent.seqno != null )
+                {
+                    entities.SnapshotToContents.Add(snapshotTocontent);
+                }
+            }
+
+            entities.SaveChanges();
+        }
+
+        public List<string> RunContent(string url)
+        {
+            var ruiwebContents = webGetutf.Load(url);
+            var content_count = 0;
+            List<string> details = new List<string>();
+            foreach (var div in ruiwebContents.DocumentNode.SelectNodes("//div"))
+            {
+                foreach(var table in div.Descendants().Where(p => p.GetAttributeValue("class","dd") == "read_cont_table"))
+                {
+                    foreach (var content in table.Descendants().Where(p => p.GetAttributeValue("class", "dd") == "tx-content-container read_cont_td"))
+                    {
+                        content_count++;
+                        if(content_count == 1)
+                        {
+                            System.Console.WriteLine("-------------------------------------------------------------------------------");
+                            System.Console.WriteLine("내용");
+                            System.Console.WriteLine(content.InnerText.Trim());
+                            System.Console.WriteLine(content.InnerHtml);
+                            details.Add(content.InnerText);
+                            details.Add(content.InnerHtml);
+                        }
+                    }
+                }
+            }
+            return details;
+        }
+    }
+}

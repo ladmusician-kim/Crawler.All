@@ -1,0 +1,110 @@
+﻿using Sitecrawler.Core.Interface;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HtmlAgilityPack;
+using Crawler.Data.DbContext;
+using System.Text.RegularExpressions;
+using Crawler.DTO.ResponseDTO;
+
+namespace Sitecrawler.Core.Code
+{
+    public class soccerlineCrawler : commonCrawler
+    {
+        private readonly int _perpage = 25;
+        protected override int perpage { get { return _perpage; } }
+
+        protected override List<ContentDTO> GetContentsPerPage(int page)
+        {
+            try
+            {
+                var contentList = new List<ContentDTO>();
+
+                //commonCrawler로 부터 상속받은 부분
+                //사커라인
+                var soccerline = webGetkr.Load("http://www.soccerline.co.kr/slboard/list.php?page=" + page + "&code=locker&keyfield=&key=&period=&");
+                System.Console.WriteLine("사커라인");
+                var soccerline_tablecount = 0;
+                var soccerline_trcount = 0;
+                var soccerline_datecount = 0;
+
+                foreach (var soccerline_table in soccerline.DocumentNode.SelectNodes("//table[@class= 'te2']"))
+                {
+                    soccerline_tablecount++;
+                    if (soccerline_tablecount == 1)
+                    {
+                        foreach (var soccerline_tr in soccerline_table.Descendants())
+                        {
+                            soccerline_trcount++;
+                            if (soccerline_trcount > 66)
+                            {
+                                var content = new ContentDTO();
+                                var article = "";
+                                DateTime time = DateTime.Now;
+
+                                foreach (var soccerline_time in soccerline_tr.Descendants().Where(p => p.GetAttributeValue("class", "dd") == "font03"))
+                                {
+                                    soccerline_datecount++;
+                                    if (soccerline_datecount == 2)
+                                    {
+                                        System.Console.WriteLine(soccerline_time.InnerText.Trim());
+                                        string timestring = soccerline_time.InnerText.Trim();
+                                        time = Convert.ToDateTime(timestring);
+                                    }
+                                    else if (soccerline_datecount == 4)
+                                    {
+                                        soccerline_datecount = 0;
+                                    }
+                                }
+
+                                foreach (var soccerline_td in soccerline_tr.Descendants())
+                                {
+                                    foreach (var soccerline_article in soccerline_td.Descendants())
+                                    {
+                                        if (soccerline_article.Name == "a")
+                                        {
+                                            foreach (var soccerline_title in soccerline_article.Descendants())
+                                            {
+                                                foreach (var soccerline_b in soccerline_title.SelectNodes("//b"))
+                                                {
+                                                    soccerline_b.InnerHtml = "";
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                            }
+
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("ReStart");
+                ParseContent(content);
+            }
+        }
+        public List<string> RunContent(string url)
+        {
+            var ruiwebContents = webGetkr.Load(url);
+            //var content_count = 0;
+            List<string> details = new List<string>();
+            foreach (var content in ruiwebContents.DocumentNode.SelectNodes("//div[@id = 'DocContent']"))
+            {
+                System.Console.WriteLine("-------------------------------------------------------------------------------");
+                System.Console.WriteLine("내용");
+                string input = content.InnerText.Trim();
+                string input2 = content.InnerHtml.Trim();
+                System.Console.WriteLine(input);
+                System.Console.WriteLine(input2);
+                details.Add(input);
+                details.Add(input2);
+            }
+            return details;
+        }
+    }
+}

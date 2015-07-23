@@ -1,0 +1,6 @@
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.TimelineWeb\bin\Crawler.TimelineWeb.dll.config
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.TimelineWeb\bin\Crawler.TimelineWeb.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.TimelineWeb\bin\Crawler.TimelineWeb.pdb
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.TimelineWeb\obj\Debug\Crawler.TimelineWeb.csprojResolveAssemblyReference.cache
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.TimelineWeb\obj\Debug\Crawler.TimelineWeb.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.TimelineWeb\obj\Debug\Crawler.TimelineWeb.pdb

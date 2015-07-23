@@ -1,0 +1,9 @@
+﻿<h1>2014-02-02 13:00</h1>
+<div class="row" ng-controller="MainpageCtrl">
+    <div class="col-md-4" ng-repeat="board in boardList">
+
+        <!--자세한 모양은 boardPanel.tpl.html에 있음-->
+        <board-panel board-id="{{board.id}}">
+        </board-panel>
+    </div>
+</div>

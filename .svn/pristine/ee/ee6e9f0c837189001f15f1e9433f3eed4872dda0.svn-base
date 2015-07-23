@@ -1,0 +1,32 @@
+﻿'use strict';
+
+
+// Demonstrate how to register services
+// In this case it is a simple constant service.
+angular.module('crawlerApp.services')
+    .factory('Snapshot', function ($http, $state, $cookieStore, CrawlerApi) {
+        return {
+            getSnapshotbyId: function (snapshotId, callback, error) {
+                CrawlerApi.get("/SnapshotGetbyIdRequestDTO", { SnapshotId: snapshotId },
+					function (data) {
+					    callback(data);
+					},
+					function (msg) {
+					    error(msg);
+					}
+				);
+                return null;
+            },
+            getSnapshotbyBoardId: function (for_boardid, callback, error) {
+                CrawlerApi.get("/SnapshotGetbyBoardIdRequestDTO", { For_BoardId: for_boardid },
+					function (data) {
+					    callback(data);
+					},
+					function (msg) {
+					    error(msg);
+					}
+				);
+                return null;
+            }
+        };
+    });

@@ -1,0 +1,30 @@
+﻿<div class="panel panel-default">
+    <div class="panel-heading">
+        <a ng-href="{{board.website.website_URL}}" style="font-weight:bold; color:black">
+            <img src="" style="height:20px" />
+            {{board.label}}
+        </a>
+        <button>새로고침</button>
+    </div>
+    <div class="">
+        <table class="table table-striped table-hover table-condensed">
+            <tbody>
+                <tr ng-repeat="content in board.snapshots[0].contents" ng-if="$index <= 10">
+                    <td class="col-md-9">
+                        <a ng-href="{{content.contents_URL}}" style="font-weight:bold;">
+                            {{content.article}}
+                        </a>
+                    </td>
+                    <td class="col-md-3">
+                        <small>{{content.crawled}}</small>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="panel-footer" style="text-align:center">
+        <a class="linkbutton" ui-sref="website({ websiteId: {{boardId}} })" style="font-weight:bold; color:black">
+            더보기
+        </a>
+    </div>
+</div>

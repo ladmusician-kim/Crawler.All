@@ -1,0 +1,18 @@
+﻿using Crawler.DTO.ResponseDTO;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Crawler.DTO.RequestDTO
+{
+    public class ContentCreateRequestDTO
+    {
+        public ContentDTO Content { get; set; }
+    }
+    public class ContentGetbyIdRequestDTO
+    {
+        public int Id { get; set; }
+    }
+}

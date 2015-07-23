@@ -1,0 +1,199 @@
+﻿using Sitecrawler.Core.Interface;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HtmlAgilityPack;
+using System.Text.RegularExpressions;
+using Crawler.Data.DbContext;
+
+namespace Sitecrawler.Core.Code
+{
+    public class nateCrawler : commonCrawler
+    {
+        // Icrawler로 부터 상속받은 부분
+        public override bool Login(string Username, string Password)
+        {
+            return true;
+        }
+
+        public override void UpdateRecentArticles(int boardid)
+        {
+        }
+
+        public override void Noop()
+        {
+
+        }
+
+        public override void ParseComment()
+        {
+
+        }
+
+        public override void ParseClickNum()
+        {
+
+        }
+
+        public override void ParseLikeNum()
+        {
+
+        }
+        public override void Run()
+        {
+            var entities = new CrawlerStorage();
+
+            //commonCrawler로 부터 상속받은 부분
+            //네이트판
+            var nate = webGetutf.Load("http://m.pann.nate.com/talk/today");
+            System.Console.WriteLine("네이트판");
+
+            //content_guid를 저장하는 List
+            List<Guid> contentList = new List<Guid>();
+
+            foreach (var nate_ul in nate.DocumentNode.SelectNodes("//ul[@class= 'list']"))
+            {
+                foreach (var nate_li in nate_ul.Descendants().Where(p => p.GetAttributeValue("class", "dd") == "nothumb"))
+                {
+                    foreach (var nate_li1 in nate_li.Descendants())
+                    {
+                        if (nate_li1.Name == "a")
+                        {
+                            var content = new Content();
+
+                            HtmlAttribute nate_url = nate_li1.Attributes["href"];
+                            System.Console.Write("http://pann.nate.com" + nate_url.Value + " ");
+                            content.Contents_URL = ("http://pann.nate.com" + nate_url.Value);
+
+                            //안의 내용을 가져오는 함수 실행.
+                            var details = RunContent("http://pann.nate.com" + nate_url.Value);
+
+                            //안의 내용 text
+                            if (details.First() != "")
+                            {
+                                content.Details = details.First();
+                            }
+                            else
+                            {
+                                content.Details = "내용 없음";
+                            }
+                            foreach (var nate_article in nate_li1.Descendants().Where(p => p.GetAttributeValue("class", "dd") == "tit"))
+                            {
+                                foreach (var nate_titletest in nate_article.Descendants())
+                                {
+                                    foreach (var nate_strong in nate_titletest.SelectNodes("//strong"))
+                                    {
+                                        nate_strong.InnerHtml = "";
+                                    }
+                                    foreach (var nate_span in nate_titletest.SelectNodes("//span[@class='count']"))
+                                    {
+                                        nate_span.InnerHtml = "";
+                                    }
+                                }
+                                System.Console.WriteLine(nate_article.InnerText.Trim() + "-> ");
+                                content.Article = (nate_article.InnerText.Trim());
+
+                                //Db -> content/crawled(글 등록 시간) 에 저장하는 부분
+                                //시간 정보 입수 하지 못함.
+                                //string time = DateTime.Now;
+                                //Convert.ToDateTime(time);
+
+                                DateTime c_time = DateTime.Now;
+                                content.Crawled = c_time;
+
+                                //Db -> content/for_boardid 에 저장하는 부분
+                                content.For_BoardId = 1;
+                                //Db -> content/for_websiteid 에 저장하는 부분
+                                content.For_WebiteId = 5;
+                                //Db -> content/_contentguid 에 저장하는 부분
+                                content.C_ContentGuId = Guid.NewGuid();
+                                //content_guid를 저장하는 부분
+                                contentList.Add(content.C_ContentGuId);
+                            }
+
+                            //안의 내용의 html
+                            if (details[1] != "")
+                            {
+                                content.Details_Html = details[1];
+
+                                string input_src = details[1];
+                                string pattern_src = "src=[\"'](.+?)[\"'].*?>";
+                                if (Regex.Matches(input_src, pattern_src).Count > 0)
+                                {
+                                    foreach (Match m in Regex.Matches(input_src, pattern_src))
+                                    {
+                                        var srcdata = new Srcdata();
+                                        System.Console.WriteLine("-------------------------------------------------------------------------------");
+                                        System.Console.WriteLine(m.Value);
+                                        srcdata.C_SrcId = Guid.NewGuid();
+                                        srcdata.For_ContentId = content.C_ContentGuId;
+                                        srcdata.Src= m.Value;
+                                        if (srcdata.C_SrcId != null && srcdata.For_ContentId != null && srcdata.Src != null)
+                                        {
+                                            entities.Srcdatas.Add(srcdata);
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                content.Details = "내용 없음";
+                            }
+                            if (content.Article != null && content.Contents_URL != null && content.Crawled != null)
+                            {
+                                entities.Contents.Add(content);
+                            }
+                        }
+                    }
+                }
+            }
+
+            var snapshot = new Snapshot();
+            snapshot.C_SnapshotId = entities.Snapshots.Count() + 1;
+            snapshot.For_WebsiteId = 5;
+            snapshot.For_Timeperiod = 1;
+            snapshot.Taken = DateTime.Now;
+
+            if (snapshot.C_SnapshotId != null && snapshot.For_WebsiteId != null && snapshot.For_Timeperiod != null && snapshot.Taken != null)
+            {
+                entities.Snapshots.Add(snapshot);
+            }
+
+            int contentSeq = 0;
+            foreach (var content in contentList)
+            {
+                var snapshotTocontent = new SnapshotToContent();
+                contentSeq++;
+                snapshotTocontent.For_SnapshotId = snapshot.C_SnapshotId;
+                snapshotTocontent.Has_ContentId = content;
+                snapshotTocontent.Seqno = contentSeq;
+
+                if (snapshotTocontent.For_SnapshotId != null && snapshotTocontent.Has_ContentId != null && snapshotTocontent.Seqno != null)
+                {
+                    entities.SnapshotToContents.Add(snapshotTocontent);
+                }
+            }
+            entities.SaveChanges();
+        }
+        public List<string> RunContent(string url)
+        {
+            var ruiwebContents = webGetutf.Load(url);
+            //var content_count = 0;
+            List<string> details = new List<string>();
+            foreach (var content in ruiwebContents.DocumentNode.SelectNodes("//div[@id = 'pann-content']"))
+            {
+                System.Console.WriteLine("-------------------------------------------------------------------------------");
+                System.Console.WriteLine("내용");
+                string input = content.InnerText.Trim();
+                string input2 = content.InnerHtml.Trim();
+                System.Console.WriteLine(input);
+                System.Console.WriteLine(input2);
+                details.Add(input);
+                details.Add(input2);
+            }
+            return details;
+        }
+    }
+}

@@ -1,0 +1,127 @@
+namespace Crawler.Data.Migrations
+{
+    using System;
+    using System.Data.Entity.Migrations;
+    
+    public partial class Migrations : DbMigration
+    {
+        public override void Up()
+        {
+            CreateTable(
+                "dbo.Boards",
+                c => new
+                    {
+                        _boardid = c.Int(nullable: false),
+                        for_websiteid = c.Int(nullable: false),
+                        label = c.String(nullable: false, maxLength: 50),
+                    })
+                .PrimaryKey(t => t._boardid)
+                .ForeignKey("dbo.Websites", t => t.for_websiteid, cascadeDelete: true)
+                .Index(t => t.for_websiteid);
+            
+            CreateTable(
+                "dbo.Snapshots",
+                c => new
+                    {
+                        _snapshotid = c.Int(nullable: false, identity: true),
+                        for_boardid = c.Int(nullable: false),
+                        for_timeperiodid = c.Int(nullable: false),
+                        taken = c.DateTime(nullable: false),
+                    })
+                .PrimaryKey(t => t._snapshotid)
+                .ForeignKey("dbo.Boards", t => t.for_boardid, cascadeDelete: true)
+                .ForeignKey("dbo.TimePeriods", t => t.for_timeperiodid, cascadeDelete: true)
+                .Index(t => t.for_boardid)
+                .Index(t => t.for_timeperiodid);
+            
+            CreateTable(
+                "dbo.SnapshotToContents",
+                c => new
+                    {
+                        _snapshottocontentid = c.Int(nullable: false, identity: true),
+                        for_snapshotid = c.Int(nullable: false),
+                        seqno = c.Int(nullable: false),
+                        has_contentid = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t._snapshottocontentid)
+                .ForeignKey("dbo.Contents", t => t.has_contentid, cascadeDelete: true)
+                .ForeignKey("dbo.Snapshots", t => t.for_snapshotid, cascadeDelete: true)
+                .Index(t => t.for_snapshotid)
+                .Index(t => t.has_contentid);
+            
+            CreateTable(
+                "dbo.Contents",
+                c => new
+                    {
+                        _contentid = c.Int(nullable: false, identity: true),
+                        contentguid = c.Guid(nullable: false),
+                        contents_url = c.String(nullable: false),
+                        article = c.String(nullable: false),
+                        crawled = c.DateTime(nullable: false),
+                        details = c.String(nullable: false),
+                        details_html = c.String(nullable: false),
+                        recommend = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t._contentid);
+            
+            CreateTable(
+                "dbo.Srcdatas",
+                c => new
+                    {
+                        _srcdataid = c.Int(nullable: false, identity: true),
+                        srcguid = c.Guid(nullable: false),
+                        for_contentid = c.Int(nullable: false),
+                        src = c.String(nullable: false),
+                    })
+                .PrimaryKey(t => t._srcdataid)
+                .ForeignKey("dbo.Contents", t => t.for_contentid, cascadeDelete: true)
+                .Index(t => t.for_contentid);
+            
+            CreateTable(
+                "dbo.TimePeriods",
+                c => new
+                    {
+                        _timeperiodid = c.Int(nullable: false),
+                        label = c.String(nullable: false),
+                        scheduled = c.DateTime(nullable: false),
+                        crawled = c.DateTime(nullable: false),
+                    })
+                .PrimaryKey(t => t._timeperiodid);
+            
+            CreateTable(
+                "dbo.Websites",
+                c => new
+                    {
+                        _websiteid = c.Int(nullable: false),
+                        label = c.String(nullable: false, maxLength: 50),
+                        website_url = c.String(nullable: false),
+                        mobile_url = c.String(nullable: false),
+                    })
+                .PrimaryKey(t => t._websiteid);
+            
+        }
+        
+        public override void Down()
+        {
+            DropForeignKey("dbo.Boards", "for_websiteid", "dbo.Websites");
+            DropForeignKey("dbo.Snapshots", "for_timeperiodid", "dbo.TimePeriods");
+            DropForeignKey("dbo.SnapshotToContents", "for_snapshotid", "dbo.Snapshots");
+            DropForeignKey("dbo.Srcdatas", "for_contentid", "dbo.Contents");
+            DropForeignKey("dbo.SnapshotToContents", "has_contentid", "dbo.Contents");
+            DropForeignKey("dbo.Snapshots", "for_boardid", "dbo.Boards");
+            DropIndex("dbo.Srcdatas", new[] { "for_contentid" });
+            DropIndex("dbo.SnapshotToContents", new[] { "has_contentid" });
+            DropIndex("dbo.SnapshotToContents", new[] { "for_snapshotid" });
+            DropIndex("dbo.Snapshots", new[] { "for_timeperiodid" });
+            DropIndex("dbo.Snapshots", new[] { "for_boardid" });
+            DropIndex("dbo.Boards", new[] { "for_websiteid" });
+            DropTable("dbo.Websites");
+            DropTable("dbo.TimePeriods");
+            DropTable("dbo.Srcdatas");
+            DropTable("dbo.Contents");
+            DropTable("dbo.SnapshotToContents");
+            DropTable("dbo.Snapshots");
+            DropTable("dbo.Boards");
+        }
+    }
+}

@@ -1,0 +1,66 @@
+﻿using Crawler.Data.DbContext;
+using Crawler.DTO.RequestDTO;
+using Crawler.DTO.ResponseDTO;
+using ServiceStack.ServiceClient.Web;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Crawler.API.ServiceCode
+{
+    public partial class CrawlerService : ServiceBase
+    {
+        /// <summary>
+        /// Cotent를 contentId를 통해서 불러오는 함수
+        /// </summary>
+        /// <param name="req">
+        /// ContentId
+        /// </param>
+        /// <returns></returns>
+        public EnvelopeDTO<ContentRevisionDTO> Any(ContentRevisionGetbyCheckSumRequestDTO req)
+        {
+            var checksum = req.CheckSum;
+
+            if (string.IsNullOrWhiteSpace(checksum))
+            {
+                return Fail<ContentRevisionDTO>("ContentRevisionGetbyCheckSumRequestDTO : parameter 'checksum' is empty.");
+            }
+            else
+            {
+                using (var entities = new CrawlerStorage())
+                {
+                    try
+                    {
+                        var contentrevision = (from c in entities.ContentRevisions.AsNoTracking()
+                                        where c.CheckSum == checksum
+                                       select new ContentRevisionDTO
+                                       {
+                                           id = c.Id
+                                           //SrcDatas = (from src in c.Srcdatas
+                                           //            select new SrcdataDTO
+                                           //            {
+                                           //                Id = src.Id,
+                                           //                SrcGuId = src.SrcGuId,
+                                           //                For_ContentId = src.For_ContentId,
+                                           //                SourceUrl = src.SourceUrl
+                                           //            }).ToList()
+                                       }).SingleOrDefault();
+
+                        if (contentrevision == null)
+                        {
+                            return Fail<ContentRevisionDTO>("ContentRevisionGetbyCheckSumRequestDTO : Contents matching given 'contentrevision' does not exist.");
+                        }
+
+                        return Succeeded(contentrevision);
+                    }
+
+                    catch (Exception e)
+                    {
+                        return Fail<ContentRevisionDTO>("ContentRevisionGetbyCheckSumRequestDTO : Exception - " + e.Message);
+                    }
+                }
+            }
+        }
+    }
+}

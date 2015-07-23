@@ -1,0 +1,40 @@
+﻿using Quartz;
+using Quartz.Impl;
+using ServiceStack.ServiceClient.Web;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Crawler.Core.Code
+{
+    public class TimePeriodManager
+    {
+        private CrawlInstance instance;
+        IScheduler scheduler;
+
+        public TimePeriodManager()
+        {
+            scheduler = StdSchedulerFactory.GetDefaultScheduler();
+            instance = new CrawlInstance();
+        }
+
+        public void InitTimer()
+        {
+            scheduler.Start();
+        }
+
+        public void ClearTimer()
+        {
+            scheduler.Clear();
+        }
+
+        public void ReloadTimePeriod()
+        {
+            JsonServiceClient client = new JsonServiceClient("http://localhost:61910");
+
+            client.Send(new TimePeriod)
+        }
+    }
+}

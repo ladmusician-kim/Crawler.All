@@ -1,0 +1,175 @@
+﻿using Crawler.DTO.RequestDTO;
+using Crawler.DTO.ResponseDTO;
+using HtmlAgilityPack;
+using ServiceStack.ServiceClient.Web;
+using Sitecrawler.Core.Interface;
+using System.Collections.Generic;
+using System.Text;
+using System;
+using System.Text.RegularExpressions;
+
+namespace Sitecrawler.Core.Code
+{
+    public abstract class commonCrawler : ICrawler
+    {
+        WebsiteDTO Website;
+        BoardDTO Board;
+
+        JsonServiceClient client;
+        SnapshotDTO Snapshot;
+
+        public commonCrawler()
+        {
+            try
+            {
+                client = new JsonServiceClient("http://localhost:61910");
+            }
+            catch (Exception e)
+            {
+
+            }
+        }
+        // content get 서비스 호출 함수
+        public SnapshotDTO getSnapshot ( int snapshotId)
+        {
+            var dto = client.Send<EnvelopeDTO<SnapshotDTO>>(new SnapshotGetbyIdRequestDTO 
+            {
+                SnapshotId = snapshotId
+            });
+
+            return dto.SafeBody;
+        }
+
+        // snapshot의 content details update 서비스 호출 함수
+        public SnapshotDTO updateSnapshot (List<ContentDTO> ContentList, int snapshotId)
+        {
+            SnapshotDTO snapshot;
+            snapshot = new SnapshotDTO
+            {
+                Id = snapshotId,
+                Contents = ContentList
+            };
+
+            var dto = new SnapshotUpdateRequestDTO
+            {
+                Snapshot = snapshot 
+            };
+
+            client.Send<EnvelopeDTO<GenericDummyDTO>>(dto);
+
+            return dto.Snapshot;
+        }
+        public SnapshotDTO SendSnapshot (List<ContentDTO> ContentList, int for_boardid)
+        {
+            //snapshot 저장 부분;
+            SnapshotDTO snapshot;
+            snapshot = new SnapshotDTO
+            {
+                For_Timeperiod = 1,
+                For_BoardId = for_boardid,
+                Taken = DateTime.Now,
+                Contents = ContentList
+            };
+
+            var dto = new SnapshotCreateRequestDTO
+            {
+                Snapshot = snapshot 
+            };
+
+            client.Send<EnvelopeDTO<GenericDummyDTO>>(dto);
+
+            return dto.Snapshot;
+            
+        }
+
+        //Src 파싱 함수
+        public List<SrcdataDTO> ParseSrc(string html)
+        {
+            List<SrcdataDTO> SrcdataList = new List<SrcdataDTO>();
+
+            string pattern_src = "src=[\"'](.+?)[\"'].*?>";
+
+            if (Regex.Matches(html, pattern_src).Count > 0)
+            {
+                foreach (Match m in Regex.Matches(html, pattern_src))
+                {
+                    System.Console.WriteLine("-------------------------------------------------------------------------------");
+                    System.Console.WriteLine(m.Value);
+
+                    SrcdataList.Add(new SrcdataDTO
+                    {
+                        Src = m.Value
+                    });
+                }
+            }
+            return SrcdataList;
+        }
+        public void createSrcdata(int for_contentId, List<SrcdataDTO> Srcdatas)
+        {
+            foreach(var srcdata in Srcdatas)
+            {
+                var dto = new SrcdataCreateRequestDTO
+                {
+                    Src = srcdata.Src,
+                    For_ContentId = for_contentId
+                };
+                client.Send<EnvelopeDTO<GenericDummyDTO>>(dto);
+            }
+        }
+
+        // Url 파싱시 &amp 태그 없애주기
+        public string ParseUrl(string url)
+        {
+            string pattern_url = "&amp;";
+            string replacement = "&";
+            string result = Regex.Replace(url, pattern_url, replacement);
+
+            return result;
+        }
+        public abstract void Run();
+
+        public abstract void getList(int count);
+        public abstract void getDetails();
+        public abstract void getImages();
+    
+        public List<string> articleList = new List<string>();
+        public List<string> urlList = new List<string>();
+        public List<string> timeList = new List<string>();
+
+        //공통으로 쓰이는 변수
+        public HtmlWeb webGetkr = new HtmlWeb
+        {
+            UserAgent = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_3_2 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8H7 Safari/6533.18.5",
+            OverrideEncoding = Encoding.GetEncoding("euc-kr")
+        };
+        
+        public HtmlWeb webGetutf = new HtmlWeb
+        {
+            UserAgent = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_3_2 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8H7 Safari/6533.18.5",
+            OverrideEncoding = Encoding.GetEncoding("UTF-8")
+        };
+        
+        //Icrawler 에서 상속받은 부분
+        public abstract bool Login(string Username, string Password);
+
+        public abstract void UpdateRecentArticles(int boardid);
+
+        public abstract void Noop();
+
+        public abstract void ParseComment();
+
+        public abstract void ParseClickNum();
+
+        public abstract void ParseLikeNum();
+
+        public abstract void StartCrawl();
+
+        public abstract void LoadImages();
+
+        public abstract void GetContents();
+
+        public abstract void DownloadImages();
+
+        public abstract void SendSnapshot();
+    }
+}

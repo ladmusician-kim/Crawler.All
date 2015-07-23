@@ -1,0 +1,108 @@
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\AutoMapper.Net4.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\Crawler.API.dll.config
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\Crawler.API.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\Crawler.API.pdb
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\AutoMapper.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\Crawler.Data.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\Crawler.DTO.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\EntityFramework.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\EntityFramework.SqlServer.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\ImgurNet.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\Magick.NET-AnyCPU.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\Microsoft.Web.Infrastructure.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\Newtonsoft.Json.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.Common.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.Interfaces.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.OrmLite.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.OrmLite.SqlServer.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.Redis.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.ServiceInterface.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.Text.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\System.Net.Http.Extensions.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\System.Net.Http.Primitives.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\WebActivator.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\protobuf-net.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\Crawler.Data.pdb
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\Crawler.DTO.pdb
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\AutoMapper.xml
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\EntityFramework.xml
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\EntityFramework.SqlServer.xml
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\Magick.NET-AnyCPU.xml
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\Newtonsoft.Json.xml
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.xml
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.Common.xml
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.Interfaces.xml
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.Redis.xml
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.Text.xml
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\System.Net.Http.Extensions.xml
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\System.Net.Http.Primitives.xml
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\protobuf-net.pdb
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\protobuf-net.xml
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\ko\EntityFramework.resources.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\ko\EntityFramework.SqlServer.resources.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\obj\Release\Crawler.API.csproj.App.config
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\obj\Release\Crawler.API.csprojResolveAssemblyReference.cache
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\obj\Release\Crawler.API.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\obj\Release\Crawler.API.pdb
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.Plugins.ProtoBuf.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\MySql.Data.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\MySql.Data.Entity.EF6.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\MoreLinq.Portable.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\MoreLinq.Portable.xml
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\MoreLinq.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.API\bin\MoreLinq.xml
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\AutoMapper.Net4.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\Crawler.API.dll.config
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\Crawler.API.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\Crawler.API.pdb
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\AutoMapper.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\Crawler.Data.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\Crawler.DTO.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\EntityFramework.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\EntityFramework.SqlServer.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\ImgurNet.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\Magick.NET-AnyCPU.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\Microsoft.Web.Infrastructure.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\MoreLinq.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\MoreLinq.Portable.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\MySql.Data.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\MySql.Data.Entity.EF6.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\Newtonsoft.Json.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\protobuf-net.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.Common.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.Interfaces.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.OrmLite.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.OrmLite.SqlServer.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.Plugins.ProtoBuf.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.Redis.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.ServiceInterface.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.Text.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\System.Net.Http.Extensions.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\System.Net.Http.Primitives.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\WebActivator.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\Crawler.Data.pdb
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\Crawler.DTO.pdb
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\AutoMapper.xml
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\EntityFramework.xml
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\EntityFramework.SqlServer.xml
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\Magick.NET-AnyCPU.xml
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\MoreLinq.xml
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\MoreLinq.Portable.xml
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\Newtonsoft.Json.xml
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\protobuf-net.pdb
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\protobuf-net.xml
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.xml
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.Common.xml
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.Interfaces.xml
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.Redis.xml
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\ServiceStack.Text.xml
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\System.Net.Http.Extensions.xml
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\System.Net.Http.Primitives.xml
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\ko\EntityFramework.resources.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\bin\ko\EntityFramework.SqlServer.resources.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\obj\Release\Crawler.API.csproj.App.config
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\obj\Release\Crawler.API.csprojResolveAssemblyReference.cache
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\obj\Release\Crawler.API.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.API\obj\Release\Crawler.API.pdb

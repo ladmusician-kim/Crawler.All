@@ -1,0 +1,102 @@
+﻿using Newtonsoft.Json;
+using ProtoBuf;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Crawler.DTO.ResponseDTO
+{
+    public class ContentDTO
+    {
+        public int Id { get; set; }
+        public Guid ContentGuId { get; set; }
+
+        public string Contents_URL { get; set; }
+
+        public string Article { get; set; }
+
+        public DateTime Crawled { get; set; }
+
+        public string Details { get; set; }
+
+        public string Details_Html { get; set; }
+
+        public BoardDTO Board{ get; set; }
+        
+        public List<SrcdataDTO> SrcDatas { get; set; }
+    }
+    public class SrcdataDTO
+    {
+        public int Id { get; set; }
+        public Guid SrcGuId { get; set; }
+
+        public int For_ContentId { get; set; }
+
+        public string Src { get; set; }
+
+        public ContentDTO Content { get; set; }
+    }
+    public class SnapshotDTO
+    {
+        public int Id { get; set; }
+
+        public int For_BoardId { get; set; }
+        public int For_Timeperiod { get; set; }
+
+        public DateTime Taken { get; set; }
+
+        public BoardDTO Board { get; set; }
+
+        public TimePeriodDTO TimePeriod { get; set; }
+
+        public List<ContentDTO> Contents { get; set; }
+        public List<SnapshotToContentDTO> SnapshotToContent { get; set; }
+    }
+    public class SnapshotToContentDTO
+    {
+        public int For_SnapshotId { get; set; }
+
+        public int Seqno { get; set; }
+
+        public int Has_ContentId { get; set; }
+        
+        public SnapshotDTO Snapshot { get; set; }
+        
+        public ContentDTO Content { get; set; }
+    }
+    public class BoardDTO
+    {
+        public int Id { get; set; }
+
+        public int For_WebsiteId { get; set; }
+
+        public string Label { get; set; }
+
+        public WebsiteDTO Website { get; set; }
+
+        public List<SnapshotDTO> Snapshots { get; set; }
+    }
+    public class WebsiteDTO
+    {
+        public int Id { get; set; }
+
+        public string Label { get; set; }
+
+        public string Website_URL { get; set; }
+
+        public string Mobile_URL { get; set; }
+    }
+    public class TimePeriodDTO
+    {
+        public int Id { get; set; }
+
+        public string Label { get; set; }
+
+        public DateTime Scheduled { get; set; }
+
+        public DateTime Crawled { get; set; }
+    }
+}

@@ -1,0 +1,318 @@
+﻿using AutoMapper;
+using Crawler.API.Helper;
+using Crawler.Data.DbContext;
+using Crawler.DTO.RequestDTO;
+using Crawler.DTO.ResponseDTO;
+using ServiceStack.ServiceClient.Web;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Crawler.API.ServiceCode
+{
+    public partial class CrawlerService : ServiceBase
+    {
+        public EnvelopeDTO<SnapshotDTO> Any(SnapshotGetbyIdRequestDTO req)
+        {
+            var snapshotId = req.SnapshotId;
+
+            if (!snapshotId.HasValue)
+            {
+                return Fail<SnapshotDTO>("SnapshotGetbyIdRequestDTO : parameter 'snapshotId' is empty.");
+            }
+
+            else
+            {
+                using (var entities = new CrawlerStorage())
+                {
+                    try
+                    {
+                        var snapshot = (from s in entities.Snapshots.AsNoTracking()
+                                        where s.Id == snapshotId
+                                        select new SnapshotDTO
+                                        {
+                                            Id = s.Id,
+                                            For_BoardId = s.For_BoardId,
+                                            For_Timeperiod = s.For_Timeperiod,
+                                            Taken = s.Taken,
+                                            TimePeriod = new TimePeriodDTO
+                                            {
+                                                Id = s.TimePeriod.Id,
+                                                Label = s.TimePeriod.Label,
+                                                Crawled = s.TimePeriod.Crawled,
+                                                Scheduled = s.TimePeriod.Scheduled
+                                            },
+                                            Board = new BoardDTO
+                                            {
+                                                Id = s.Board.Id,
+                                                Label = s.Board.Label,
+                                                For_WebsiteId = s.Board.For_WebsiteId
+                                            },
+                                            ContentRevisions = (from c in s.SnapshotToContentRevisions
+                                                                let con = c.ContentRevision
+                                                                select new ContentRevisionDTO
+                                                                {
+                                                                    Crawled = con.Crawled,
+                                                                    Details = con.Details,
+                                                                    Details_Html = con.Details_Html,
+                                                                    isDepricate = con.IsDepricated,
+                                                                }).ToList(),
+                                        }).SingleOrDefault();
+                        
+                        var dto = Mapper.DynamicMap<SnapshotDTO>(snapshot);
+
+                        return Succeeded(dto);
+                    }
+
+                    catch (Exception e)
+                    {
+                        return Fail<SnapshotDTO>("SnapshotGetbyIdRequestDTO : Exception --->" + e);
+                    }
+                }
+            }
+        }
+        public EnvelopeDTO<SnapshotDTO> Any(SnapshotSaveRequestDTO req)
+        {
+            var timeslot = req.TimeSlot;
+            return null;
+        }
+
+        /// <summary>
+        /// Snapshot을 SnapshotDTO를 통해서 Create 하는 함수
+        /// </summary>
+        /// <param name="req">
+        /// SnapshotDTO
+        /// </param>
+        /// <returns></returns>
+        public EnvelopeDTO<SnapshotDTO> Any(SnapshotCreateRequestDTO req)
+        {
+            var Snapshot = req.Snapshot;
+            using (var entities = new CrawlerStorage())
+            {
+                try
+                {
+                    var snapshot = new Snapshot();
+                    snapshot.For_Timeperiod = Snapshot.For_Timeperiod;
+                    snapshot.Taken = Snapshot.Taken;
+                    snapshot.For_BoardId = Snapshot.For_BoardId;
+
+                    entities.Snapshots.Add(snapshot);
+
+                    int contentseq = 0;
+                    foreach (var snapshotscontentrevision in Snapshot.ContentRevisions)
+                    {   
+                        var contentrevision = new ContentRevision ();
+                        
+                        if (snapshotscontentrevision.Content != null)
+                        {
+                            contentrevision.Details = snapshotscontentrevision.Details;
+                            contentrevision.Details_Html = snapshotscontentrevision.Details_Html;
+                            contentrevision.Crawled = snapshotscontentrevision.Crawled;
+                            contentrevision.RecommendCount = snapshotscontentrevision.recommendCount;
+                            contentrevision.ViewCount = snapshotscontentrevision.viewCount;
+                            contentrevision.CheckSum = snapshotscontentrevision.CheckSum;
+
+                            var content = new Content();
+                            content.Article = snapshotscontentrevision.Content.Article;
+                            content.Contents_URL = snapshotscontentrevision.Content.Contents_URL;
+                            content.ContentGuId = Guid.NewGuid();
+                            content.Url_Params = snapshotscontentrevision.Content.Url_Params;
+                            content.CheckSum = Convert.ToBase64String(HashHelper.ObjectToMD5Hash(snapshotscontentrevision.Content.Url_Params));
+
+                            if(snapshotscontentrevision.SrcDatas != null)
+                            {
+                                foreach (var data in snapshotscontentrevision.SrcDatas)
+                                {
+                                    if (data != null)
+                                    {
+                                        var srcdata = new Srcdata();
+                                        srcdata.SrcGuId = Guid.NewGuid();
+                                        srcdata.Original_SourceUrl = data.SourceUrl;
+                                        srcdata.Content = content;
+
+                                        entities.Srcdatas.Add(srcdata);
+                                    }
+                                    else
+                                    {
+                                        continue;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                continue;
+                            }
+
+                            contentrevision.Content = content;
+
+                            entities.Contents.Add(content);
+
+                            entities.ContentRevisions.Add(contentrevision);
+
+                            contentseq++;
+
+                            var snapshotTocontentrevision = new SnapshotToContentRevision();
+                            snapshotTocontentrevision.Snapshot = snapshot;
+                            snapshotTocontentrevision.ContentRevision = contentrevision;
+                            snapshotTocontentrevision.Seqno = contentseq;
+
+                            entities.SnapshotToContentRevisions.Add(snapshotTocontentrevision);
+                        }
+                        else
+                        {
+                            contentseq++;
+
+                            var oldcontentrevision = (from c in entities.ContentRevisions.AsNoTracking()
+                                                      where c.CheckSum.Equals(snapshotscontentrevision.CheckSum)
+                                                      select new ContentRevisionDTO
+                                                      {
+                                                          id = c.Id
+                                                      }).SingleOrDefault();
+                            
+                            var snapshotTocontentrevision = new SnapshotToContentRevision();
+                            snapshotTocontentrevision.Has_ContentRevisionId = oldcontentrevision.id;
+                            snapshotTocontentrevision.For_SnapshotId = Snapshot.Id;
+                            snapshotTocontentrevision.Seqno = contentseq;
+
+                            entities.SnapshotToContentRevisions.Add(snapshotTocontentrevision);
+                        }
+                    }
+
+                    try
+                    {
+                        entities.SaveChanges();
+                        return Succeeded(new SnapshotDTO());
+                    }
+                    catch(Exception e)
+                    {
+                        return null;
+                    }
+                }
+
+                catch (System.Data.Entity.Validation.DbEntityValidationException dbEx)
+                {
+                    Exception raise = dbEx;
+                    foreach (var validationErrors in dbEx.EntityValidationErrors)
+                    {
+                        foreach (var validationError in validationErrors.ValidationErrors)
+                        {
+                            string message = string.Format("{0}:{1}",
+                                validationErrors.Entry.Entity.ToString(),
+                                validationError.ErrorMessage);
+                            raise = new InvalidOperationException(message, raise);
+                        }
+                    }
+                    throw raise;
+                }
+            }
+        }
+
+        /// <summary>
+        /// SnapshotDTO를 for_boardid를 통해서 가져오는 함수
+        /// </summary>
+        /// <param name="req">
+        /// for_boardid
+        /// </param>
+        /// <returns>
+        /// SnapshotDTO
+        /// </returns>
+        public EnvelopeDTO<SnapshotDTO> Any(SnapshotGetbyBoardIdRequestDTO req)
+        {
+            var for_boardid = req.For_BoardId;
+
+            if (!for_boardid.HasValue)
+            {
+                return Fail<SnapshotDTO>("SnapshotGetbyIdRequestDTO : parameter 'for_boardid' is empty.");
+            }
+
+            else
+            {
+                using (var entities = new CrawlerStorage())
+                {
+                    try
+                    {
+                        var snapshots = (from s in entities.Snapshots.AsNoTracking()
+                                         where s.For_BoardId == for_boardid
+                                         select new SnapshotDTO
+                                         {
+                                             Id = s.Id,
+                                             For_BoardId = s.For_BoardId,
+                                             Board = new BoardDTO
+                                             {
+                                                 Id = s.Board.Id,
+                                                 Label = s.Board.Label,
+                                                 For_WebsiteId = s.Board.For_WebsiteId
+                                             },
+                                             ContentRevisions = (from c in s.SnapshotToContentRevisions
+                                                                 let con = c.ContentRevision
+                                                                 select new ContentRevisionDTO
+                                                                 {
+                                                                     CheckSum = con.CheckSum
+                                                                 }).ToList(),
+                                         }).ToList().OrderBy(p => p.For_BoardId).FirstOrDefault();
+                        var dto = Mapper.DynamicMap<SnapshotDTO>(snapshots);
+
+                        return Succeeded(dto);
+                    }
+
+                    catch (Exception e)
+                    {
+                        return Fail<SnapshotDTO>("SnapshotGetbyIdRequestDTO : Exception --->" + e);
+                    }
+                }
+            }
+        }
+
+        //public EnvelopeDTO<SnapshotDTO> Any(SnapshotUpdateRequestDTO req)
+        //{
+        //    var Snapshot = req.Snapshot;
+        //    using (var entities = new CrawlerStorage())
+        //    {
+        //        try
+        //        {
+        //            var snapshots = entities.Snapshots.SingleOrDefault(p => p.Id == Snapshot.Id);
+
+        //            foreach (var content in snapshots.SnapshotToContent)
+        //            {
+        //                foreach (var Scontent in Snapshot.Contents)
+        //                {
+        //                    if (content.Content.Id == Scontent.Id)
+        //                    {
+        //                        if (Scontent.Details != null && Scontent.Details_Html != null)
+        //                        {
+        //                            content.Content.Details = Scontent.Details;
+        //                            content.Content.Details_Html = Scontent.Details_Html;
+        //                            content.Content.IsDepricated = Scontent.isDepricate;
+        //                        }
+        //                        //else
+        //                        //{
+        //                        //    content.Content.Details = "데이터 없음";
+        //                        //    content.Content.Details_Html = "데이터 없음";
+        //                        //}
+        //                    }
+        //                }
+        //            }
+        //            entities.SaveChanges();
+        //            return Succeeded(new SnapshotDTO());
+        //        }
+
+        //        catch (System.Data.Entity.Validation.DbEntityValidationException dbEx)
+        //        {
+        //            Exception raise = dbEx;
+        //            foreach (var validationErrors in dbEx.EntityValidationErrors)
+        //            {
+        //                foreach (var validationError in validationErrors.ValidationErrors)
+        //                {
+        //                    string message = string.Format("{0}:{1}",
+        //                        validationErrors.Entry.Entity.ToString(),
+        //                        validationError.ErrorMessage);
+        //                    raise = new InvalidOperationException(message, raise);
+        //                }
+        //            }
+        //            throw raise;
+        //        }
+        //    }
+        //}
+    }
+}

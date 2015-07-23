@@ -1,0 +1,373 @@
+﻿using Crawler.DTO.RequestDTO;
+using Crawler.DTO.ResponseDTO;
+using HtmlAgilityPack;
+using Sitecrawler.Core.Interface;
+using System.Collections.Generic;
+using System.Text;
+using System;
+using System.Net;
+using System.Threading.Tasks;
+using System.Linq;
+using Crawler.API.Helper;
+using System.Web;
+
+using ServiceStack.Plugins.ProtoBuf;
+using ServiceStack.ServiceClient.Web;
+
+namespace Sitecrawler.Core.Code
+{
+  
+    public abstract class commonCrawler : ICrawler
+    {
+        
+        ProtoBufServiceClient client;
+        protected SnapshotDTO Snapshot;
+
+        public commonCrawler()
+        {
+            try
+            {
+                client = new ProtoBufServiceClient("http://localhost:61910");
+            }
+            catch (Exception e)
+            {
+
+            }
+        }
+        
+        protected abstract int perpage { get;}
+        
+        public void GetList(int count)
+        {
+            var pagecount = (int)((count - 1) / perpage);
+
+            var dic = new Dictionary<int, List<ContentRevisionDTO>>();
+
+            try
+            {
+                Parallel.For(1, pagecount + 2, i =>
+                {
+                    var list = GetContentsPerPage(i);
+                    if(list == null)
+                    {
+                        Console.WriteLine("GetContentsPerPage 할때 문제가 있습니다.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("GetContentsPerPage이 정상적으로 작동됩니다.");
+                    }
+                    
+                    dic.Add(i, list);
+                });
+
+                var orderedlist = dic.OrderBy(d => d.Key);
+                var finallist = new List<ContentRevisionDTO>();
+
+                foreach (var eachList in orderedlist)
+                {
+                    finallist.AddRange(eachList.Value);
+                }
+
+                Snapshot = new SnapshotDTO
+                {
+                    ContentRevisions = finallist.Take(count).ToList(),
+
+                };
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+        public SnapshotDTO Getsnapshot(int snapshotId)
+        {
+            try
+            {
+                var dto = client.Send<EnvelopeDTO<SnapshotDTO>>(new SnapshotGetbyIdRequestDTO
+                {
+                    SnapshotId = snapshotId
+                });
+                return dto.SafeBody;
+            }
+            catch (OutOfMemoryException)
+            {
+                Console.WriteLine("메모리 오류 입니다.");
+
+                return null;
+            }
+            catch(Exception e)
+            {
+                return null;
+            }
+
+           
+        }
+        public SnapshotDTO GetsnapshotbyBoard(int boardid)
+        {
+            try
+            {
+                var dto = client.Send<EnvelopeDTO<SnapshotDTO>>(new SnapshotGetbyBoardIdRequestDTO
+                {
+                    For_BoardId = boardid
+                });
+
+                return dto.SafeBody;
+            }
+            catch (OutOfMemoryException)
+            {
+                Console.WriteLine("메모리 오류 입니다.");
+
+                return null;
+            }
+            catch(Exception e)
+            {
+                return null;
+            }
+        }
+
+        
+        public SnapshotDTO SendSnapshot(List<ContentRevisionDTO> ContentRevisionList, int for_boardid)
+        {
+            //snapshot 저장 부분;
+            SnapshotDTO snapshot;
+            snapshot = new SnapshotDTO
+            {
+                For_Timeperiod = 1,
+                For_BoardId = for_boardid,
+                Taken = DateTime.Now,
+                ContentRevisions = ContentRevisionList
+            };
+
+            try
+            {
+                var dto = client.Send<EnvelopeDTO<SnapshotDTO>>(new SnapshotCreateRequestDTO
+                {
+                    Snapshot = snapshot
+                });
+
+                return dto.SafeBody;
+            }
+            catch (OutOfMemoryException)
+            {
+                Console.WriteLine("메모리 오류 입니다.");
+
+                return null;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+
+         
+        }
+        public ErrorLogDTO SendErrorLog (ErrorLogDTO ErrorLog)
+        {
+            ErrorLogDTO errorlog;
+            errorlog = new ErrorLogDTO
+            {
+                Error_Address = ErrorLog.Error_Address,
+                Error_URL = ErrorLog.Error_URL,
+                Error_Details = ErrorLog.Error_Details,
+                Hresult = ErrorLog.Hresult
+            };
+
+            var dto = new ErrorLogCreateRequestDTO
+            {
+                ErrorLog = errorlog
+            };
+
+            client.Send<EnvelopeDTO<ErrorLogDTO>>(dto);
+
+            return dto.ErrorLog;
+        }
+        public void CompareContent (int for_boardid , SnapshotDTO Snapshot)
+        {
+
+            var LastSnapshot = GetsnapshotbyBoard(for_boardid);
+            var CurrentSnapshot = Snapshot;
+            int count = 0;
+            if (LastSnapshot != null && LastSnapshot.ContentRevisions != null)
+            {
+                foreach (var contentrevision in CurrentSnapshot.ContentRevisions)
+                {
+                    var checksumParams = contentrevision.Content.Url_Params;
+                    var checksum = Convert.ToBase64String(HashHelper.ObjectToMD5Hash(checksumParams));
+                    contentrevision.CheckSum = checksum;
+                    foreach (var Lastcontentrevision in LastSnapshot.ContentRevisions)
+                    {
+                        if (checksum.Equals(Lastcontentrevision.CheckSum))
+                        {
+                            contentrevision.Content = null;
+                            count++;
+                        }
+                    }
+                }
+                var Newcontentcount = CurrentSnapshot.ContentRevisions.Count - count;
+                count = 0;
+                Console.WriteLine("이번에" + for_boardid + "에서 새로 생성된 글은" + Newcontentcount + "개 입니다.");
+                SendSnapshot(Snapshot.ContentRevisions, for_boardid);
+            }
+            else
+            {
+                foreach (var contentrevision in CurrentSnapshot.ContentRevisions)
+                {
+                    var checksumParams = contentrevision.Content.Url_Params;
+                    var checksum = Convert.ToBase64String(HashHelper.ObjectToMD5Hash(checksumParams));
+                    contentrevision.CheckSum = checksum;
+                }
+                Console.WriteLine("이번에" + for_boardid + "에서 새로 생성된 글은 50개 입니다.");
+                SendSnapshot(Snapshot.ContentRevisions, for_boardid);
+            }
+
+        }
+        //public SnapshotDTO SaveSnapshot(SnapshotDTO snapshot)
+        //{
+        //    var dto = client.Send<EnvelopeDTO<SnapshotDTO>>(new SnapshotCreateRequestDTO
+        //    {
+        //        Snapshot = snapshot
+        //    });
+
+        //    return dto.SafeBody;
+        //}
+        protected abstract List<ContentRevisionDTO> GetContentsPerPage(int page);
+
+        public void ParseArticles()
+        {
+            var for_boardid = 0;
+            if (Snapshot.ContentRevisions != null)
+            {
+                Parallel.ForEach(Snapshot.ContentRevisions, contentrevision =>
+                {
+                    ParseContent(contentrevision);
+                    CacheImage(contentrevision);
+                    for_boardid = contentrevision.For_BoardId;
+                });
+            }
+            CompareContent(for_boardid, Snapshot);
+        }
+
+
+        public SnapshotDTO getSnapshot(int snapshotId)
+        {
+            try
+            {
+                var dto = client.Send<EnvelopeDTO<SnapshotDTO>>(new SnapshotGetbyIdRequestDTO
+                {
+                    SnapshotId = snapshotId
+                });
+
+                return dto.SafeBody;
+            }
+            catch (OutOfMemoryException)
+            {
+                Console.WriteLine("메모리 오류 입니다.");
+
+                return null;
+            }
+            catch(Exception e)
+            {
+                return null;
+            }
+
+        }
+
+        protected abstract void ParseContent(ContentRevisionDTO contentrevision);
+
+
+
+
+        protected void CacheImage(ContentRevisionDTO ContentRevision)
+        {
+            try
+            {
+                if (ContentRevision.SrcDatas != null)
+                {
+                    Parallel.ForEach(ContentRevision.SrcDatas, srcdata =>
+                    {
+                        var client = new WebClient();
+                        //System.Console.WriteLine(content.Contents_URL);
+                        var url = new Uri(HttpUtility.HtmlDecode(srcdata.SourceUrl));
+
+                        client.Headers.Add("Accept", @"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+                        client.Headers.Add("Referer", ContentRevision.Content.Contents_URL);
+                        client.Headers.Add("Accept-Encoding", @"gzip, deflate, sdch");
+                        client.Headers.Add("Accept-Language", @"ko,en-US;q=0.8,en;q=0.6");
+                        client.Headers.Add("User-Agent", webGetkr.UserAgent);
+                        client.UseDefaultCredentials = true;
+                        try
+                        {
+                            //System.Console.WriteLine("client : " + client.Headers["User-Agent"] + client.Headers["Referer"]);
+                            //System.Console.WriteLine(url);
+                   
+                            var data = client.DownloadData(url);
+                            
+                            srcdata.OriginalPayload = data;
+                        }
+                        catch (ArgumentNullException)
+                        {
+                            try
+                            {
+                                var data = client.DownloadData(url);
+
+                                srcdata.OriginalPayload = data;
+                            }
+                            catch (ArgumentNullException)
+                            {
+                                try
+                                {
+                                    var data = client.DownloadData(url);
+
+                                    srcdata.OriginalPayload = data;
+                                }
+                                catch (ArgumentNullException)
+                                {
+                                    srcdata.IsDepricated = true;
+                                    return;
+                                }
+                            }
+                        }
+                        catch(Exception e)
+                        {
+                            Console.WriteLine("Error");
+                            Console.WriteLine(e);
+                            
+                            var errorlog = new ErrorLogDTO
+                            {
+                                Error_Address = "SrcData",
+                                Error_URL = url.AbsoluteUri,
+                                Error_Details = e.Message.ToString(),
+                                Hresult = e.HResult
+                            };
+                            //SendErrorLog(errorlog);
+
+                            return;
+                        }
+                    });
+                }
+            }
+            catch (WebException wex)
+            {
+                if (((HttpWebResponse)wex.Response).StatusCode == HttpStatusCode.NotFound)
+                {
+                    // error 404, do what you need to do
+                }
+            }
+        }
+
+        //공통으로 쓰이는 변수
+        public HtmlWeb webGetkr = new HtmlWeb
+        {
+            UserAgent = @"Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_3_2 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8H7 Safari/6533.18.5",
+            OverrideEncoding = Encoding.GetEncoding("euc-kr")
+        };
+        
+        public HtmlWeb webGetutf = new HtmlWeb
+        {
+            UserAgent = @"Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_3_2 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8H7 Safari/6533.18.5",
+            OverrideEncoding = Encoding.GetEncoding("UTF-8")
+        };
+        
+        //Icrawler 에서 상속받은 부분
+       
+    }
+}

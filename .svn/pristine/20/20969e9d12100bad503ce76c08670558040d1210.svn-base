@@ -1,0 +1,91 @@
+﻿using Crawler.Core.Code;
+using Crawler.DTO.RequestDTO;
+using Crawler.DTO.ResponseDTO;
+using Crawler.Scheduler.Jobs;
+using Sitecrawler.Core.Code;
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+    
+namespace ConsoleApplication1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            CrawlInstance instance = new CrawlInstance();
+
+            instance.Start();
+            instance.AddJob();
+
+            //var begintime = DateTime.Now;
+
+            //var crawler1 = new ruiwebCrawler();
+            //var crawler2 = new bobaedreamCrawler();
+            //var crawler3 = new cookCrawler();
+            //var crawler4 = new slrclubCrawler();
+            //var crawler5 = new nateCrawler();
+            //var crawler6 = new soccerlineCrawler();
+            //var crawler7 = new mparkCrawler();
+            //var crawler8 = new issueinCrawler();
+            //var crawler9 = new humorCrwaler();
+            //var crawler10 = new IlbeCrawler();
+            //var crawler11 = new dogdripCrawler();
+            //var crawler12 = new pomppuCrawler();
+
+            //crawler1.GetList(50);
+            //crawler1.ParseArticles();
+
+            //crawler2.GetList(50);
+            //crawler2.ParseArticles();
+
+            //crawler3.GetList(50);
+            //crawler3.ParseArticles();
+
+            //crawler4.GetList(50);
+            //crawler4.ParseArticles();
+
+            //crawler5.GetList(50);
+            //crawler5.ParseArticles();
+
+            //crawler6.GetList(50);
+            //crawler6.ParseArticles();
+
+            //crawler7.GetList(50);
+            //crawler7.ParseArticles();
+
+            //crawler8.GetList(50);
+            //crawler8.ParseArticles();
+
+            //crawler9.GetList(50);
+            //crawler9.ParseArticles();
+
+            //crawler10.GetList(50);
+            //crawler10.ParseArticles();
+
+            //crawler11.GetList(50);
+            //crawler11.ParseArticles();
+
+            //crawler12.GetList(50);
+            //crawler12.ParseArticles();
+
+            //var endtime = DateTime.Now.Subtract(begintime).TotalMilliseconds;
+
+            //System.Console.WriteLine(endtime + "ms");
+            //System.Console.ReadLine();
+
+            //TimePeriodManager mgr = new TimePeriodManager();
+
+            //mgr.InitTimer();
+
+            //List<IJob> jobs = new List<IJob>();
+
+            //mgr.AddCrawlers();
+            //mgr.RunJob(null);
+        }
+    }
+}   

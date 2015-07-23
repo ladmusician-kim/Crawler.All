@@ -1,0 +1,75 @@
+﻿using Crawler.Data.DbContext;
+using Crawler.DTO.RequestDTO;
+using Crawler.DTO.ResponseDTO;
+using ServiceStack.ServiceClient.Web;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Crawler.API.ServiceCode
+{
+    public partial class CrawlerService : ServiceBase
+    {
+        public EnvelopeDTO<GenericDummyDTO> Any(SnapshotToContentCreateRequestDTO req)
+        {
+            var For_SnapshotId = req.For_SnapshotId;
+            var Has_contentid = req.Has_ContentId;
+            var Seqno = req.Seqno;
+            
+            using (var entities = new CrawlerStorage())
+            {
+                try
+                {
+                    var snapshotTocontent = new SnapshotToContent();
+
+                    snapshotTocontent.For_SnapshotId = For_SnapshotId;
+                    snapshotTocontent.Has_ContentId = Has_contentid;
+                    snapshotTocontent.Seqno = Seqno;
+
+                    entities.SnapshotToContents.Add(snapshotTocontent);
+
+                    entities.SaveChanges();
+
+                    return Succeeded(new GenericDummyDTO ());
+                }
+                catch (Exception e)
+                {
+                    return Fail<GenericDummyDTO>("e");
+                }
+            }
+        }
+        public EnvelopeDTO<SnapshotToContentDTO> Any(SnapshotToContentGetbyIdRequestDTO req)
+        {
+            var For_SnapshotId = req.For_SnapshotId;
+            var Has_ContentId = req.Has_ContentId;
+
+            using (var entities = new CrawlerStorage())
+            {
+                try
+                {
+                    var snapshotTocontent = (from s in entities.SnapshotToContents
+                                             where s.For_SnapshotId == For_SnapshotId && s.Has_ContentId == Has_ContentId
+                                             select new SnapshotToContentDTO
+                                                {
+                                                    For_SnapshotId = s.For_SnapshotId,
+                                                    Has_ContentId = s.Has_ContentId,
+                                                    Seqno = s.Seqno
+                                                }).SingleOrDefault();
+
+                    if (snapshotTocontent == null)
+                    {
+                        return Fail<SnapshotToContentDTO>("SnapshotToContentGetbyIdRequestDTO : SnapshotToContent matching given 'snapshotTocontent' does not exist.");
+                    }
+
+                    return Succeeded(snapshotTocontent);
+                }
+
+                catch (Exception e)
+                {
+                    return Fail<SnapshotToContentDTO>("SnapshotToContentGetbyIdRequestDTO : Exception - " + e.Message);
+                }
+            }
+        }
+    }
+}

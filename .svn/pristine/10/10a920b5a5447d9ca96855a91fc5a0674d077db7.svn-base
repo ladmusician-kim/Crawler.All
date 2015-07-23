@@ -1,0 +1,70 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crawler.API", "Crawler.API\Crawler.API.csproj", "{2512DA2E-63A2-48E7-9615-536E228B886B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crawler.Data", "Crawler.Data\Crawler.Data.csproj", "{BFBBBB6A-1D53-4647-BA8A-390D816C573C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Storage", "Storage", "{CA4B77E6-2779-4DA4-A7E5-54A13EA6D600}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{7710AF99-C604-486A-9F30-666755A49A24}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{F600F0C8-4C98-4253-94E5-5FA384F2FB5B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crawler.DTO", "Crawler.DTO\Crawler.DTO.csproj", "{B59805B1-331C-4701-A7F9-4801A5675C67}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crawler.Core", "Crawler.Core\Crawler.Core.csproj", "{BBFE2811-9117-400B-9167-23034D583DD6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crawler.Executable", "Crawler.Executable\Crawler.Executable.csproj", "{F2D84ABF-EF59-4547-A7BA-1EEEFE73FC03}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crawler.Scheduler", "Crawler.Scheduler\Crawler.Scheduler.csproj", "{2991FD2A-7C0D-4035-A0CA-C47ACDF29F24}"
+EndProject
+Global
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2512DA2E-63A2-48E7-9615-536E228B886B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2512DA2E-63A2-48E7-9615-536E228B886B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2512DA2E-63A2-48E7-9615-536E228B886B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2512DA2E-63A2-48E7-9615-536E228B886B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BFBBBB6A-1D53-4647-BA8A-390D816C573C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFBBBB6A-1D53-4647-BA8A-390D816C573C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BFBBBB6A-1D53-4647-BA8A-390D816C573C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BFBBBB6A-1D53-4647-BA8A-390D816C573C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B59805B1-331C-4701-A7F9-4801A5675C67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B59805B1-331C-4701-A7F9-4801A5675C67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B59805B1-331C-4701-A7F9-4801A5675C67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B59805B1-331C-4701-A7F9-4801A5675C67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BBFE2811-9117-400B-9167-23034D583DD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBFE2811-9117-400B-9167-23034D583DD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBFE2811-9117-400B-9167-23034D583DD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBFE2811-9117-400B-9167-23034D583DD6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2D84ABF-EF59-4547-A7BA-1EEEFE73FC03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2D84ABF-EF59-4547-A7BA-1EEEFE73FC03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2D84ABF-EF59-4547-A7BA-1EEEFE73FC03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2D84ABF-EF59-4547-A7BA-1EEEFE73FC03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2991FD2A-7C0D-4035-A0CA-C47ACDF29F24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2991FD2A-7C0D-4035-A0CA-C47ACDF29F24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2991FD2A-7C0D-4035-A0CA-C47ACDF29F24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2991FD2A-7C0D-4035-A0CA-C47ACDF29F24}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2512DA2E-63A2-48E7-9615-536E228B886B} = {CA4B77E6-2779-4DA4-A7E5-54A13EA6D600}
+		{BFBBBB6A-1D53-4647-BA8A-390D816C573C} = {CA4B77E6-2779-4DA4-A7E5-54A13EA6D600}
+		{B59805B1-331C-4701-A7F9-4801A5675C67} = {F600F0C8-4C98-4253-94E5-5FA384F2FB5B}
+		{BBFE2811-9117-400B-9167-23034D583DD6} = {7710AF99-C604-486A-9F30-666755A49A24}
+		{F2D84ABF-EF59-4547-A7BA-1EEEFE73FC03} = {7710AF99-C604-486A-9F30-666755A49A24}
+		{2991FD2A-7C0D-4035-A0CA-C47ACDF29F24} = {7710AF99-C604-486A-9F30-666755A49A24}
+	EndGlobalSection
+EndGlobal

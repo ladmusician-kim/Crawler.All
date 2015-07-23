@@ -1,0 +1,52 @@
+﻿using Crawler.Data.DbContext;
+using Crawler.DTO.RequestDTO;
+using Crawler.DTO.ResponseDTO;
+using ServiceStack.ServiceClient.Web;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Crawler.API.ServiceCode
+{
+    public partial class CrawlerService : ServiceBase
+    {
+        public EnvelopeDTO<SrcdataDTO> Any(SrcdataGetbycontentIdRequestDTO req)
+        {
+            var For_ContentId = req.For_ContentId;
+
+            if (For_ContentId == null)
+            {
+                return Fail<SrcdataDTO>("SrcdataGetbyIdRequestDTO : parameter 'For_ContentId' is empty.");
+            }
+
+            using (var entities = new CrawlerStorage())
+            {
+                try
+                {           
+                    var srcdata = (from s in entities.Srcdatas
+                                   where s.Id == For_ContentId
+                                 select new SrcdataDTO
+                                 {
+                                     Id = s.Id,
+                                     SrcGuId = s.SrcGuId,
+                                     Src = s.Src,
+                                     For_ContentId = s.For_ContentId
+                                 
+                                 }).SingleOrDefault();
+
+                    if (srcdata == null)
+                    {
+                        return Fail<SrcdataDTO>("SrcdataGetbyIdRequestDTO : Website matching given 'For_ContentId' does not exist.");
+                    }
+                    return Succeeded(srcdata);
+                }
+
+                catch (Exception e)
+                {
+                    return Fail<SrcdataDTO>("SrcdataGetbyIdRequestDTO : Exception - " + e.Message);
+                }
+            }
+        }
+    }
+}

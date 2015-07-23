@@ -1,0 +1,148 @@
+﻿using Sitecrawler.Core.Interface;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HtmlAgilityPack;
+using Crawler.Data.DbContext;
+using System.Text.RegularExpressions;
+using Crawler.DTO.ResponseDTO;
+
+namespace Sitecrawler.Core.Code
+{
+    public class dogdripCrawler : commonCrawler
+    {
+        // Icrawler로 부터 상속받은 부분
+        public override bool Login(string Username, string Password)
+        {
+            return true;
+        }
+
+        public override void UpdateRecentArticles(int boardid)
+        {
+        }
+
+        public override void Noop()
+        {
+
+        }
+
+        public override void ParseComment()
+        {
+
+        }
+
+        public override void ParseClickNum()
+        {
+
+        }
+
+        public override void ParseLikeNum()
+        {
+
+        }
+        public override void Run()
+        {
+            List<ContentDTO> contentList = new List<ContentDTO>();
+            List<int> snapTocontentList = new List<int>();
+
+            //commonCrawler로 부터 상속받은 부분
+            //개드립
+            var dogdrip = webGetutf.Load("http://www.dogdrip.net/dogdrip");
+            var dogdrip_timecount = 0;
+            
+            //sitename
+            System.Console.WriteLine("개드립");
+            
+            foreach (var dogdrip_ul in dogdrip.DocumentNode.SelectNodes("//ul[@class= 'lt']"))
+            {
+                foreach (var dogdrip_li in dogdrip_ul.Descendants())
+                {
+                    foreach (var dogdrip_li1 in dogdrip_li.Descendants())
+                    {
+                        if (dogdrip_li1.Name == "a")
+                        {
+                            var content = new ContentDTO();
+
+                            var dogdrip_article = dogdrip_li1.Descendants().SingleOrDefault(p => p.GetAttributeValue("class", "dd") == "title");
+                            foreach (var dogdrip_em in dogdrip_article.Descendants().Where(p => p.Name == "em"))
+                            {
+                                dogdrip_em.InnerHtml = "";
+                            }
+                            System.Console.Write(dogdrip_article.InnerText.Trim() + "-> ");
+                            var article = (dogdrip_article.InnerText.Trim());
+                            
+                            List<string> timeList = new List<string>();
+                            foreach(var dogdrip_time in dogdrip_li1.Descendants().Where(p => p.GetAttributeValue("class", "dd") == "time"))
+                            {
+                                timeList.Add(dogdrip_time.InnerText.Trim());
+                            }
+
+                            DateTime time = Convert.ToDateTime(timeList[0]);
+
+                            HtmlAttribute dogdrip_url = dogdrip_li1.Attributes["href"];
+                            System.Console.Write(dogdrip_url.Value + " ");
+
+                            // url
+                            var url = (dogdrip_url.Value);
+                            // srcdata
+                            List<SrcdataDTO> SrcDatas = new List<SrcdataDTO>();
+
+                            //안의 내용을 가져오는 함수 실행.
+                            var innerArticle = RunContent(dogdrip_url.Value);
+                            var details = "";
+                            var details_html = "";
+
+                            //안의 내용 text
+                            if (innerArticle.First() != "")
+                            {
+                                details = innerArticle.First();
+                            }
+                            else
+                            {
+                                details = "내용이 없습니다.";
+                            }
+                       
+                            //안의 내용의 html
+                            if (innerArticle[1] != "")
+                            {
+                                details_html = innerArticle[1];
+                                SrcDatas = ParseSrc(innerArticle[1]); 
+                            }
+                            contentList.Add(new ContentDTO
+                            {
+                                Crawled = time,
+                                Contents_URL = url,
+                                Article = article,
+                                Details = details,
+                                Details_Html = details_html,
+                                SrcDatas = SrcDatas
+                            });
+                        }
+                    }
+                }
+            }
+            SendSnapshot(contentList, 11);
+        }
+        public List<string> RunContent(string url)
+        {
+            var dogdripContents = webGetutf.Load(url);
+            //var content_count = 0;
+            List<string> details = new List<string>();
+            foreach (var content in dogdripContents.DocumentNode.SelectNodes("//div[@id = 'article_1']"))
+            {
+                System.Console.WriteLine("-------------------------------------------------------------------------------");
+                System.Console.WriteLine("내용");
+                string input = content.InnerText.Trim();
+                string input2 = content.InnerHtml.Trim();
+
+                System.Console.WriteLine(input);
+                System.Console.WriteLine(input2);
+                details.Add(input);
+                details.Add(input2);
+            }
+            return details;
+        }
+    }
+}

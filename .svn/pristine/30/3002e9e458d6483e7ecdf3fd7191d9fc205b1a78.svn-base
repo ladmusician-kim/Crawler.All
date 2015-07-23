@@ -1,0 +1,143 @@
+﻿using Crawler.API.Helper;
+using Crawler.Data.DbContext;
+using Crawler.DTO.RequestDTO;
+using Crawler.DTO.ResponseDTO;
+using ServiceStack.ServiceClient.Web;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Crawler.API.ServiceCode
+{
+    public partial class CrawlerService : ServiceBase
+    {
+        /// <summary>
+        /// Srcdata를 For_ContentId를 통해서 가져오는 함수
+        /// </summary>
+        /// <param name="req"
+        /// For_ContentId
+        /// ></param>
+        /// <returns></returns>
+        public EnvelopeDTO<List<SrcdataDTO>> Any(SrcdataGetbycontentIdRequestDTO req)
+        {
+            var For_ContentId = req.For_ContentId;
+
+            if (!For_ContentId.HasValue)
+            {
+                return Fail<List<SrcdataDTO>>("SrcdataGetbyIdRequestDTO : parameter 'For_ContentId' is empty.");
+            }
+            else
+            {
+                using (var entities = new CrawlerStorage())
+                {
+                    try
+                    {
+                        var srcdata = (from s in entities.Srcdatas.AsNoTracking()
+                                       where s.For_ContentId == For_ContentId
+                                       select new SrcdataDTO
+                                       {
+                                           Id = s.Id,
+                                           SrcGuId = s.SrcGuId,
+                                           SourceUrl = s.SourceUrl,
+                                           For_ContentId = s.For_ContentId
+                                       }).ToList();
+
+                        if (srcdata == null)
+                        {
+                            return Fail<List<SrcdataDTO>>("SrcdataGetbyIdRequestDTO : Src matching given 'For_ContentId' does not exist.");
+                        }
+                        return Succeeded(srcdata);
+                    }
+
+                    catch (Exception e)
+                    {
+                        return Fail<List<SrcdataDTO>>("SrcdataGetbyIdRequestDTO : Exception - " + e.Message);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Srcdata를 For_ContentId, Src를 통해서 Create 하는 함수
+        /// </summary>
+        /// <param name="req">
+        /// For_ContentId
+        /// </param>
+        /// <param name="req">
+        /// Src
+        /// </param>
+        /// <returns></returns>
+        public EnvelopeDTO<GenericDummyDTO> Any(SrcdataCreateRequestDTO req)
+        {
+            var srcdata = req.Srcdata;
+
+            try
+            {
+                if (!srcdata.For_ContentId.HasValue && !string.IsNullOrWhiteSpace(srcdata.SourceUrl))
+                {
+                    return Fail<GenericDummyDTO>("BoardCreateRequestDTO : parameter 'For_ContentId' is empty.");
+                }
+                if (srcdata.For_ContentId.HasValue && string.IsNullOrWhiteSpace(srcdata.SourceUrl))
+                {
+                    return Fail<GenericDummyDTO>("BoardCreateRequestDTO : parameter 'SourceUrl' is empty.");
+                }
+                if (!srcdata.For_ContentId.HasValue && string.IsNullOrWhiteSpace(srcdata.SourceUrl))
+                {
+                    return Fail<GenericDummyDTO>("BoardCreateRequestDTO : parameter 'For_ContentId' && 'SourceUrl' are empty.");
+                }
+                else
+                {
+                    using (var entities = new CrawlerStorage())
+                    {
+                        try
+                        {
+                            var DBsrcdata = new Srcdata();
+                            DBsrcdata.SourceUrl = srcdata.SourceUrl;
+                            DBsrcdata.For_ContentId = srcdata.For_ContentId.Value;
+                            DBsrcdata.FileName = srcdata.FileName;
+                            DBsrcdata.CheckSum = Convert.ToBase64String(HashHelper.ObjectToMD5Hash(srcdata.SourceUrl));
+                            DBsrcdata.SrcGuId = Guid.NewGuid();
+
+                            entities.Srcdatas.Add(DBsrcdata);
+
+                            entities.SaveChanges();
+
+                            return Succeeded(new GenericDummyDTO());
+                        }
+                        catch (System.Data.Entity.Validation.DbEntityValidationException dbEx)
+                        {
+                            Exception raise = dbEx;
+                            foreach (var validationErrors in dbEx.EntityValidationErrors)
+                            {
+                                foreach (var validationError in validationErrors.ValidationErrors)
+                                {
+                                    string message = string.Format("{0}:{1}",
+                                        validationErrors.Entry.Entity.ToString(),
+                                        validationError.ErrorMessage);
+                                    raise = new InvalidOperationException(message, raise);
+                                }
+                            }
+                            throw raise;
+                        }
+                    }
+                }
+            }
+            catch (System.Data.Entity.Validation.DbEntityValidationException dbEx)
+            {
+                Exception raise = dbEx;
+                foreach (var validationErrors in dbEx.EntityValidationErrors)
+                {
+                    foreach (var validationError in validationErrors.ValidationErrors)
+                    {
+                        string message = string.Format("{0}:{1}",
+                            validationErrors.Entry.Entity.ToString(),
+                            validationError.ErrorMessage);
+                        raise = new InvalidOperationException(message, raise);
+                    }
+                }
+                throw raise;
+            }
+        }
+    }
+}

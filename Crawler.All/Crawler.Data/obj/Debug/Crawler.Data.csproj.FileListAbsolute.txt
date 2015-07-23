@@ -1,0 +1,14 @@
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\bin\Debug\Crawler.Data.dll.config
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\bin\Debug\Crawler.Data.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\bin\Debug\Crawler.Data.pdb
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\bin\Debug\EntityFramework.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\bin\Debug\EntityFramework.SqlServer.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\bin\Debug\EntityFramework.xml
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\bin\Debug\EntityFramework.SqlServer.xml
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\bin\Debug\ko\EntityFramework.resources.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\bin\Debug\ko\EntityFramework.SqlServer.resources.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\obj\Debug\Crawler.Data.csprojResolveAssemblyReference.cache
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\obj\Debug\Crawler.Data.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\obj\Debug\Crawler.Data.pdb
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\obj\Debug\Crawler.Data.Migrations.Migrations.resources
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\obj\Debug\Crawler.Data.csproj.GenerateResource.Cache

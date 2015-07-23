@@ -1,0 +1,18 @@
+namespace Crawler.Data.Migrations
+{
+    using System;
+    using System.Data.Entity.Migrations;
+    
+    public partial class Migrations : DbMigration
+    {
+        public override void Up()
+        {
+            AddColumn("dbo.Contents", "is_duplicate", c => c.Boolean(nullable: false));
+        }
+        
+        public override void Down()
+        {
+            DropColumn("dbo.Contents", "is_duplicate");
+        }
+    }
+}

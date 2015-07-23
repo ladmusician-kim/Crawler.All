@@ -1,0 +1,181 @@
+﻿using Quartz;
+using Quartz.Impl;
+using Sitecrawler.Core.Code;
+using Sitecrawler.Core.Interface;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Crawler.Core.Jobs
+{
+    public class CrawlInstance
+    {
+        IJobDetail Ilbejob;
+        IJobDetail Ruiwebjob;
+        IJobDetail Cookjob;
+        IJobDetail Dogdripjob;
+        IJobDetail Humorjob;
+        IJobDetail Bobaejob;
+        IJobDetail Issueinjob;
+        IJobDetail Mparkjob;
+        IJobDetail Natejob;
+        IJobDetail pomppujob;
+        IJobDetail slrjob;
+        IJobDetail soccerLinejob;
+
+        IScheduler scheduler;
+
+        public CrawlInstance()
+        {
+            scheduler = StdSchedulerFactory.GetDefaultScheduler();
+        }
+
+        public void AddJob()
+        {
+           
+            //soccerLinejob = JobBuilder.Create<CrawlsoccerLine>()
+            //                .WithIdentity("soccerLinejob", "group6")
+            //                .Build();
+            
+            //ITrigger trigger6 = TriggerBuilder.Create()
+            //       .WithIdentity("trigger6", "group6")
+            //       .StartNow()
+            //       .WithSimpleSchedule(x => x
+            //           .WithIntervalInSeconds(60)
+            //           .RepeatForever())
+            //       .Build();
+            
+            //scheduler.ScheduleJob(soccerLinejob, trigger6);
+           
+        }
+
+        public void AddJob(IJob job, ICrawler crawler, DateTime date){
+        }
+
+        public void Start()
+        {
+            scheduler.Start();
+        }
+
+        public void Stop()
+        {
+            scheduler.Shutdown();
+        }
+
+    }
+
+    public class CommonJob : IJob
+    {
+        public ICrawler Crawler {get; set;}
+
+        public CommonJob(ICrawler crawler){
+            Crawler = crawler;
+        }
+
+        public void Execute(IJobExecutionContext context)
+        {
+            //Crawler.Run();
+        }
+        
+    }
+
+    //public class CrawlRuiweb : IJob
+    //{
+    //    public void Execute(IJobExecutionContext context)
+    //    {
+    //        ruiwebCrawler ruiweb = new ruiwebCrawler();
+    //        ruiweb.Run();
+    //    }
+    //}
+    //public class CrawlBobae : IJob
+    //{
+    //    public void Execute(IJobExecutionContext context)
+    //    {
+    //        bobaedreamCrawler bobae = new bobaedreamCrawler();
+    //        bobae.Run();
+    //    }
+    //}
+
+    //public class CrawlCook: IJob
+    //{
+    //    public void Execute(IJobExecutionContext context)
+    //    {
+    //        cookCrawler cook = new cookCrawler();
+    //        cook.Run();
+    //    }
+    //}
+    //public class Crawlslr : IJob
+    //{
+    //    public void Execute(IJobExecutionContext context)
+    //    {
+    //        slrclubCrawler slr = new slrclubCrawler();
+    //        slr.Run();
+    //    }
+    //}
+    //public class Crawlnate : IJob
+    //{
+    //    public void Execute(IJobExecutionContext context)
+    //    {
+    //        nateCrawler nate = new nateCrawler();
+    //        nate.Run();
+    //    }
+    //}
+    //public class CrawlsoccerLine : IJob
+    //{
+    //    public void Execute(IJobExecutionContext context)
+    //    {
+    //        soccerlineCrawler soccerLine = new soccerlineCrawler();
+    //        soccerLine.Run();
+    //    }
+    //}
+    //public class CrawlMpark : IJob
+    //{
+    //    public void Execute(IJobExecutionContext context)
+    //    {
+    //        mparkCrawler mpark = new mparkCrawler();
+    //        mpark.Run();
+    //    }
+    //}
+    //public class CrawlIsuue : IJob
+    //{
+    //    public void Execute(IJobExecutionContext context)
+    //    {
+    //        issueinCrawler issuein = new issueinCrawler();
+    //        issuein.Run();
+    //    }
+    //}
+    //public class CrawlHumor : IJob
+    //{
+    //    public void Execute(IJobExecutionContext context)
+    //    {
+    //        humorCrwaler humor = new humorCrwaler();
+    //        humor.Run();
+    //    }
+    //}
+    public class CrawlIlbe : IJob
+    {
+        public void Execute(IJobExecutionContext context)
+        {
+            cookCrawler ilbe = new cookCrawler();
+           // ilbe.Run();
+        }
+    }
+    //public class CrawlDogdrip : IJob
+    //{
+    //    public void Execute(IJobExecutionContext context)
+    //    {
+    //        dogdripCrawler dogdrip = new dogdripCrawler();
+    //        dogdrip.Run();
+    //    }
+    //}
+    //public class Crawlpomppu: IJob
+    //{
+    //    public void Execute(IJobExecutionContext context)
+    //    {
+    //        pomppuCrawler pomppu = new pomppuCrawler();
+    //        pomppu.Run();
+    //    }
+    //}
+}

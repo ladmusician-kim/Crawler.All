@@ -1,0 +1,526 @@
+﻿<!DOCTYPE html>
+<html ng-app="crawlerView" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+    <script type="text/javascript" src="//cdn.jsdelivr.net/angularjs/1.3.4/angular.min.js"></script>
+    <script type="text/javascript" src="//cdn.jsdelivr.net/angular.ui-router/0.2.13/angular-ui-router.min.js"></script>
+    <script src="//cdn.jsdelivr.net/jquery/2.1.1/jquery.min.js"></script>
+    <!--<link rel="stylesheet" href="//cdn.jsdelivr.net/bootstrap/3.3.1/css/bootstrap-theme.css">-->
+    <!--<link rel="stylesheet" href="//cdn.jsdelivr.net/bootstrap/3.3.1/css/bootstrap-theme.min.css">-->
+    <!--<link rel="stylesheet" href="//cdn.jsdelivr.net/bootstrap/3.3.1/css/bootstrap.css">-->
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/bootstrap/3.3.1/css/bootstrap.min.css">
+    <script src="//cdn.jsdelivr.net/bootstrap/3.3.1/js/bootstrap.js"></script>
+    <!--<script src="//cdn.jsdelivr.net/bootstrap/3.3.1/js/bootstrap.min.js"></script>-->
+    <script src="//cdn.jsdelivr.net/bootstrap/3.3.1/js/npm.js"></script>
+    <script src="scripts/app.js"></script>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/bootstrap.material-design/0.2.0/css/material-wfont.min.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/bootstrap.material-design/0.2.0/css/material.min.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/bootstrap.material-design/0.2.0/css/ripples.min.css">
+    <script src="//cdn.jsdelivr.net/bootstrap.material-design/0.2.0/js/material.min.js"></script>
+    <script src="//cdn.jsdelivr.net/bootstrap.material-design/0.2.0/js/ripples.min.js"></script>
+    <link href="css/less/material.css" rel="stylesheet" />
+    <script src="https://cdn.rawgit.com/FezVrasta/dropdown.js/master/jquery.dropdown.js"></script>
+    <link href="//cdn.rawgit.com/FezVrasta/dropdown.js/master/jquery.dropdown.css" rel="stylesheet">
+
+    <style>
+    </style>
+    <script>
+        $(document).ready(function () {
+            $("#dropdown-menu select").dropdown();
+        });
+    </script>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <div class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="http://localhost:52083/" style="font-weight:bold; font-size:30px;">Crawler</a>
+            </div>
+            <div class="navbar-collapse collapse navbar-responsive-collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="http://localhost:52083/">모아보기</a></li>
+                    <li class="active"><a href="/tpl/website/websiteDetails.tpl.html">사이트별</a></li>
+                    <li class="dropdown">
+                        <a href="/tpl/search/searchResult.tpl.html" class="dropdown-toggle" data-toggle="dropdown">검색 조건 <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/tpl/search/searchResult.tpl.html">전체</a></li>
+                            <li><a href="javascript:void(0)">키워드</a></li>
+                            <li><a href="javascript:void(0)">날짜</a></li>
+                            <li><a href="javascript:void(0)">웹사이트</a></li>
+                            <!--<li class="divider"></li>
+                            <li class="dropdown-header">Dropdown header</li>
+                            <li><a href="javascript:void(0)">Separated link</a></li>
+                            <li><a href="javascript:void(0)">One more separated link</a></li>-->
+                        </ul>
+                    </li>
+                </ul>
+                <form class="navbar-form navbar-left">
+                    <input type="text" class="form-control col-lg-8" placeholder="Search">
+                </form>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="javascript:void(0)">Link</a></li>
+                    <li class="dropdown">
+                        <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="javascript:void(0)">Action</a></li>
+                            <li><a href="javascript:void(0)">Another action</a></li>
+                            <li><a href="javascript:void(0)">Something else here</a></li>
+                            <li class="divider"></li>
+                            <li><a href="javascript:void(0)">Separated link</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+    <div class="container">
+        <ui-view></ui-view>
+    </div>
+</body>
+</html>
+
+<div class="row">
+    <div class="container">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <img src="http://img4.wikia.nocookie.net/__cb20131025161136/nuri/ko/images/1/10/%EC%9D%BC%EB%B2%A0%EB%A1%9C%EA%B3%A0.png" style="height:20px" />
+                <a href="http://www.ilbe.com/" style="color:black; margin-left:10px; font-weight:bold">
+                     일간베스트 저장소
+                </a>
+                > 
+                <a style="color:black; font-weight:bold" href="http://www.ilbe.com/ilbe">
+                    일베
+                </a>
+            </div>
+            <a class="col-md-9 panel-heading" style="font-weight:bold">
+                내용
+            </a>
+            <a class="col-md-3 panel-heading" style="font-weight:bold">
+                시간
+            </a>
+            <div class="">
+                <table class="table table-striped table-hover table-condensed">
+                    <tbody>
+                        <tr>
+                            <!--<td class="col-md-2">
+                                <span class="label label-success">역대급</span>
+                            </td>-->
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    밥은먹고 다니냐.jpg 
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-12-04 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    인터스텔라... 5차원공간...
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    시바 물개 새끼.swf
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    와이프와 사는 이유
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    스님 PC방에서 JPG
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    야리가또...
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    독일 정치 클라스.JPG
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    한국판] 꽐라녀 레전드
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    (pic) 별거 아닌데 은근히 신..
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    유승호 마인드 쩌네요 有
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    밥은먹고 다니냐.jpg
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-12-04 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    인터스텔라... 5차원공간...
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    시바 물개 새끼.swf
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    와이프와 사는 이유
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    스님 PC방에서 JPG
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    야리가또...
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    독일 정치 클라스.JPG
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    [한국판] 꽐라녀 레전드
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    (pic) 별거 아닌데 은근히 신..
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    유승호 마인드 쩌네요 有
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <!--<td class="col-md-2">
+                                <span class="label label-success">역대급</span>
+                            </td>-->
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    밥은먹고 다니냐.jpg
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-12-04 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    인터스텔라... 5차원공간...
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    시바 물개 새끼.swf
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    와이프와 사는 이유
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    스님 PC방에서 JPG
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    야리가또...
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    독일 정치 클라스.JPG
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    한국판] 꽐라녀 레전드
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    (pic) 별거 아닌데 은근히 신..
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    유승호 마인드 쩌네요 有
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <!--<td class="col-md-2">
+                                <span class="label label-success">역대급</span>
+                            </td>-->
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    밥은먹고 다니냐.jpg
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-12-04 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    인터스텔라... 5차원공간...
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    시바 물개 새끼.swf
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    와이프와 사는 이유
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    스님 PC방에서 JPG
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    야리가또...
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    독일 정치 클라스.JPG
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    한국판] 꽐라녀 레전드
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    (pic) 별거 아닌데 은근히 신..
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-9">
+                                <a href="http://www.ilbe.com/4801430425" style="font-weight:bold; padding:10px;">
+                                    유승호 마인드 쩌네요 有
+                                </a>
+                            </td>
+                            <td class="col-md-3">
+                                <small>2014-02-02 12:27</small>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

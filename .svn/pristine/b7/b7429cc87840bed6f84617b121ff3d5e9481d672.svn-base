@@ -1,0 +1,178 @@
+﻿using Sitecrawler.Core.Interface;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HtmlAgilityPack;
+using Crawler.Data.DbContext;
+using System.Text.RegularExpressions;
+using Crawler.DTO.ResponseDTO;
+
+namespace Sitecrawler.Core.Code
+{
+    public  class slrclubCrawler : commonCrawler
+    {
+        // Icrawler로 부터 상속받은 부분
+        public override bool Login(string Username, string Password)
+        {
+            return true;
+        }
+
+        public override void UpdateRecentArticles(int boardid)
+        {
+        }
+
+        public override void Noop()
+        {
+
+        }
+
+        public override void ParseComment()
+        {
+
+        }
+
+        public override void ParseClickNum()
+        {
+
+        }
+
+        public override void ParseLikeNum()
+        {
+
+        }
+
+        public override void StartCrawl()
+        {
+
+        }
+
+        public override void LoadImages()
+        {
+
+        }
+
+        public override void GetContents()
+        {
+
+        }
+
+        public override void DownloadImages()
+        {
+
+        }
+
+        public override void SendSnapshot()
+        {
+
+        }
+        public override void getList(int count)
+        {
+            List<ContentDTO> contentList = new List<ContentDTO>();
+            List<int> snapTocontentList = new List<int>();
+            
+            //commonCrawler로 부터 상속받은 부분
+            //SLR 클럽
+            var slr = webGetkr.Load("http://m.slrclub.com/l/free");
+            var slr_licount = 0;
+            System.Console.WriteLine("SLR클럽");
+
+            foreach (var slr_ul in slr.DocumentNode.SelectNodes("//ul[@class= 'list']"))
+            {
+                foreach (var slr_div in slr_ul.Descendants().Where(p => p.GetAttributeValue("class", "dd") == "article"))
+                {
+                    slr_licount++;
+                    if (slr_licount > 3)
+                    {
+                        foreach (var slr_a in slr_div.Descendants().Where(p => p.GetAttributeValue("class", "dd") == "subject"))
+                        {
+                            foreach (var slr_article in slr_a.Descendants())
+                            {
+                                if (slr_article.Name == "a")
+                                {
+                                    var content = new ContentDTO();
+                                    var article = "";
+
+                                    //시간 정보 입수 하지 못함.
+                                    DateTime time = DateTime.Now;
+
+                                    System.Console.WriteLine(slr_article.InnerText.Trim());
+                                    article = (slr_article.InnerText.Trim());
+
+                                    HtmlAttribute slr_url = slr_article.Attributes["href"];
+                                    System.Console.Write("http://m.slrclub.com" + slr_url.Value + " ");
+                                    var url = ("http://m.slrclub.com" + slr_url.Value);
+
+                                    //안의 내용을 가져오는 함수 실행.
+                                    var innerArticle = RunContent(url);
+
+                                    var details = "";
+                                    var details_html = "";
+                                    List<SrcdataDTO> SrcDatas = new List<SrcdataDTO>();
+
+                                    //안의 내용
+                                    if (innerArticle.First() != "")
+                                    {
+                                        //details 저장
+                                        details = innerArticle.First();
+                                    }
+                                    else
+                                    {
+                                        details = "내용이 없습니다.";
+                                    }
+                                    //안의 내용의 html
+                                    if (innerArticle[1] != "")
+                                    {
+                                        //details_html 저장
+                                        details_html = innerArticle[1];
+                                        SrcDatas = ParseSrc(details_html);
+                                    }
+
+                                    contentList.Add( new ContentDTO
+                                    {
+                                        Crawled = time,
+                                        Contents_URL = url,
+                                        Article = article,
+                                        Details = details,
+                                        Details_Html = details_html,
+                                        SrcDatas = SrcDatas
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            SendSnapshot(contentList, 4);
+        }
+        public override void getDetails()
+        {
+
+        }
+        public override void getImages()
+        {
+
+        }
+        public override void Run()
+        {
+
+        }
+        public List<string> RunContent(string url)
+        {
+            var ruiwebContents = webGetkr.Load(url);
+            //var content_count = 0;
+            List<string> details = new List<string>();
+            foreach (var content in ruiwebContents.DocumentNode.SelectNodes("//div[@class = 'contents']"))
+            {
+                System.Console.WriteLine("-------------------------------------------------------------------------------");
+                System.Console.WriteLine("내용");
+                System.Console.WriteLine(content.InnerText.Trim());
+                System.Console.WriteLine(content.InnerHtml.Trim());
+                details.Add(content.InnerText.Trim());
+                details.Add(content.InnerHtml.Trim());
+            }
+            return details;
+        }
+    }
+}

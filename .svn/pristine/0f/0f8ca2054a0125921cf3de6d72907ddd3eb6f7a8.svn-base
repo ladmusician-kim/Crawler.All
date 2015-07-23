@@ -1,0 +1,154 @@
+﻿using Sitecrawler.Core.Interface;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HtmlAgilityPack;
+using Crawler.Data.DbContext;
+using System.Text.RegularExpressions;
+using Crawler.DTO.ResponseDTO;
+
+
+namespace Sitecrawler.Core.Code
+{
+    public class cookCrawler : commonCrawler
+    {
+        // Icrawler로 부터 상속받은 부분
+        public override bool Login(string Username, string Password)
+        {
+            return true;
+        }
+
+        public override void UpdateRecentArticles(int boardid)
+        {
+        }
+
+        public override void Noop()
+        {
+
+        }
+
+        public override void ParseComment()
+        {
+
+        }
+
+        public override void ParseClickNum()
+        {
+
+        }
+
+        public override void ParseLikeNum()
+        {
+
+        }
+
+        public override void StartCrawl()
+        {
+
+        }
+
+        public override void LoadImages()
+        {
+
+        }
+
+        public override void GetContents()
+        {
+
+        }
+
+        public override void DownloadImages()
+        {
+
+        }
+
+        public override void SendSnapshot()
+        {
+
+        }
+
+        public override void getList(int count)
+        {
+            List<ContentDTO> contentList = new List<ContentDTO>();
+            List<int> snapTocontentList = new List<int>();
+
+            //commonCrawler로 부터 상속받은 부분
+            // 82cook
+            var cook = webGetutf.Load("http://www.82cook.com/entiz/enti.php?bn=15");
+            var cook_licount = 0;
+            System.Console.WriteLine("82cook");
+
+            foreach (var cook_div in cook.DocumentNode.SelectNodes("//td[@class= 'title']"))
+            {
+                var content = new ContentDTO();
+
+                cook_licount++;
+                if (cook_licount > 3)
+                {
+                    var anchortag = cook_div.ChildNodes.SingleOrDefault(c => c.Name.Equals("a"));
+                    var url = "http://www.82cook.com/entiz/" + anchortag.GetAttributeValue("href", "undefined");
+                    var Article = cook_div.InnerText.Trim();
+                    var url_parmas= anchortag.GetAttributeValue("href", "undefined");
+
+                    System.Console.WriteLine(url);
+                    System.Console.WriteLine(Article);
+                    System.Console.WriteLine(url_parmas);
+
+
+                    contentList.Add(new ContentDTO
+                    {
+                        Crawled = DateTime.Now,
+                        Contents_URL = url,
+                        Article = Article,
+                        Url_Params = url_parmas
+                    });
+                }
+            }
+            SendSnapshot(contentList, 3);
+        }
+        public override void getDetails()
+        {
+
+        }
+        public override void getImages()
+        {
+
+        }
+        public override void Run()
+        {
+
+        }
+        public List<string> RunContent(string url)
+        {
+            var ruiwebContents = webGetutf.Load(url);
+            //var content_count = 0;
+            List<string> details = new List<string>();
+            foreach (var content in ruiwebContents.DocumentNode.SelectNodes("//div[@id = 'articleBody']"))
+            {
+                string input = content.InnerText.Trim();
+                string input2 = content.InnerHtml.Trim();
+                string pattern = "<!-- s : 기사 본문 -->";
+                string pattern2 = "<!-- e : 기사 본문 -->";
+                string replacement = "";
+                string result = Regex.Replace(input, pattern, replacement);
+                string result_1 = Regex.Replace(result, pattern2, replacement);
+                string result2 = Regex.Replace(input2, pattern, replacement);
+                string result2_1 = Regex.Replace(result2, pattern2, replacement);
+
+                System.Console.WriteLine("-------------------------------------------------------------------------------");
+                System.Console.WriteLine("HTML 내용");
+                System.Console.WriteLine(result_1.Trim());
+
+                System.Console.WriteLine("-------------------------------------------------------------------------------");
+                System.Console.WriteLine("HTML 태그");
+                System.Console.WriteLine(result2_1.Trim());
+
+                details.Add(result_1.Trim());
+                details.Add(result2_1.Trim());
+            }
+            return details;
+        }
+    }
+}

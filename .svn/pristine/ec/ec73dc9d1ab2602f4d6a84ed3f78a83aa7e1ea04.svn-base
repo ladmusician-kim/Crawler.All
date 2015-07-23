@@ -1,0 +1,91 @@
+namespace Crawler.Data.Migrations
+{
+    using System;
+    using System.Data.Entity.Migrations;
+    
+    public partial class Migrations : DbMigration
+    {
+        public override void Up()
+        {
+            DropForeignKey("dbo.SnapshotToContents", "has_contentid", "dbo.Contents");
+            DropForeignKey("dbo.SnapshotToContents", "for_snapshotid", "dbo.Snapshots");
+            DropIndex("dbo.SnapshotToContents", new[] { "for_snapshotid" });
+            DropIndex("dbo.SnapshotToContents", new[] { "has_contentid" });
+            CreateTable(
+                "dbo.SnapshotToContentRevisions",
+                c => new
+                    {
+                        _snapshottocontentrevisionid = c.Int(nullable: false, identity: true),
+                        for_snapshotid = c.Int(nullable: false),
+                        seqno = c.Int(nullable: false),
+                        has_contentrevisionid = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t._snapshottocontentrevisionid)
+                .ForeignKey("dbo.ContentRevisions", t => t.has_contentrevisionid, cascadeDelete: true)
+                .ForeignKey("dbo.Snapshots", t => t.for_snapshotid, cascadeDelete: true)
+                .Index(t => t.for_snapshotid)
+                .Index(t => t.has_contentrevisionid);
+            
+            CreateTable(
+                "dbo.ContentRevisions",
+                c => new
+                    {
+                        _contentrevisionid = c.Int(nullable: false, identity: true),
+                        crawled = c.DateTime(nullable: false),
+                        checksum = c.String(nullable: false, maxLength: 24),
+                        for_contentid = c.Int(nullable: false),
+                        details = c.String(),
+                        details_html = c.String(),
+                        recommend_count = c.Int(nullable: false),
+                        view_count = c.Int(nullable: false),
+                        is_depricate = c.Boolean(nullable: false),
+                    })
+                .PrimaryKey(t => t._contentrevisionid)
+                .ForeignKey("dbo.Contents", t => t.for_contentid, cascadeDelete: true)
+                .Index(t => t.for_contentid);
+            
+            AddColumn("dbo.Contents", "checksum", c => c.String(nullable: false));
+            DropColumn("dbo.Contents", "crawled");
+            DropColumn("dbo.Contents", "details");
+            DropColumn("dbo.Contents", "details_html");
+            DropColumn("dbo.Contents", "recommend_count");
+            DropColumn("dbo.Contents", "view_count");
+            DropColumn("dbo.Contents", "is_depricate");
+            DropTable("dbo.SnapshotToContents");
+        }
+        
+        public override void Down()
+        {
+            CreateTable(
+                "dbo.SnapshotToContents",
+                c => new
+                    {
+                        _snapshottocontentid = c.Int(nullable: false, identity: true),
+                        for_snapshotid = c.Int(nullable: false),
+                        seqno = c.Int(nullable: false),
+                        has_contentid = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t._snapshottocontentid);
+            
+            AddColumn("dbo.Contents", "is_depricate", c => c.Boolean(nullable: false));
+            AddColumn("dbo.Contents", "view_count", c => c.Int(nullable: false));
+            AddColumn("dbo.Contents", "recommend_count", c => c.Int(nullable: false));
+            AddColumn("dbo.Contents", "details_html", c => c.String());
+            AddColumn("dbo.Contents", "details", c => c.String());
+            AddColumn("dbo.Contents", "crawled", c => c.DateTime(nullable: false));
+            DropForeignKey("dbo.SnapshotToContentRevisions", "for_snapshotid", "dbo.Snapshots");
+            DropForeignKey("dbo.SnapshotToContentRevisions", "has_contentrevisionid", "dbo.ContentRevisions");
+            DropForeignKey("dbo.ContentRevisions", "for_contentid", "dbo.Contents");
+            DropIndex("dbo.ContentRevisions", new[] { "for_contentid" });
+            DropIndex("dbo.SnapshotToContentRevisions", new[] { "has_contentrevisionid" });
+            DropIndex("dbo.SnapshotToContentRevisions", new[] { "for_snapshotid" });
+            DropColumn("dbo.Contents", "checksum");
+            DropTable("dbo.ContentRevisions");
+            DropTable("dbo.SnapshotToContentRevisions");
+            CreateIndex("dbo.SnapshotToContents", "has_contentid");
+            CreateIndex("dbo.SnapshotToContents", "for_snapshotid");
+            AddForeignKey("dbo.SnapshotToContents", "for_snapshotid", "dbo.Snapshots", "_snapshotid", cascadeDelete: true);
+            AddForeignKey("dbo.SnapshotToContents", "has_contentid", "dbo.Contents", "_contentid", cascadeDelete: true);
+        }
+    }
+}

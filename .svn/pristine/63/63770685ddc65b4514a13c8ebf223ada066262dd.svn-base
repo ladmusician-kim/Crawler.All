@@ -1,0 +1,17 @@
+﻿'use strict';
+
+//filters
+angular.module('filters', [])
+.filter('fixTime', ['$filter', function ($filter) {
+    return function (date) {
+        var currentTime = $filter('date')(new Date(), 'yyyy-MM-dd HH:mm:ss');
+        return (currentTime);
+    };
+}])
+.filter('substringArticle', ['$filter', function ($filter) {
+    return function (article) {
+        var subArticle = article.substring(0, 17);
+        return (subArticle);
+    };
+}])
+

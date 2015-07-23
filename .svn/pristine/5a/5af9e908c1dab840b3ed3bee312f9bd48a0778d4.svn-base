@@ -1,0 +1,164 @@
+﻿using Crawler.Data.DbContext;
+using Crawler.DTO.RequestDTO;
+using Crawler.DTO.ResponseDTO;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Crawler.API.ServiceCode
+{
+    public partial class CrawlerService : ServiceBase
+    {
+        /// <summary>
+        /// Website를 Website_Id를 통해서 불러오는 함수
+        /// </summary>
+        /// <param name="req">
+        /// Website_Id
+        /// </param>
+        /// <returns></returns>
+        public EnvelopeDTO<WebsiteDTO> Any(WebsiteGetbyIdRequestDTO req)
+        {
+            var websiteId = req.WebsiteId;
+
+            if (!websiteId.HasValue)
+            {
+                return Fail<WebsiteDTO>("WebsiteGetbyIdRequestDTO : parameter 'websiteId' is empty.");
+            }
+            else
+            {
+                using (var entities = new CrawlerStorage())
+                {
+                    try
+                    {
+                        var website = (from w in entities.Websites
+                                       where w.Id == websiteId
+                                       select new WebsiteDTO
+                                       {
+                                           Id = w.Id,
+                                           Label = w.Label,
+                                           Website_URL = w.Website_URL,
+                                           Mobile_URL = w.Mobile_URL
+                                       }).SingleOrDefault();
+
+                        if (website == null)
+                        {
+                            return Fail<WebsiteDTO>("WebsiteGetbyIdRequestDTO : Website matching given 'WebsiteId' does not exist.");
+                        }
+
+                        return Succeeded(website);
+                    }
+
+                    catch (Exception e)
+                    {
+                        return Fail<WebsiteDTO>("WebsiteGetbyIdRequestDTO : Exception - " + e.Message);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// WebsiteList를 가져오는 함수
+        /// </summary>
+        /// <returns>
+        /// WebsiteList
+        /// </returns>
+        public EnvelopeDTO<List<WebsiteDTO>> Any(WebsiteGetListRequestDTO req)
+        {
+            var websites = (from w in context.Websites
+                            orderby w.Id
+                            select new WebsiteDTO
+                            {
+                                Id = w.Id,
+                                Label = w.Label,
+                                Mobile_URL = w.Mobile_URL,
+                                Website_URL = w.Website_URL
+                            }).ToList();
+
+            return Succeeded(websites);
+        }
+
+        /// <summary>
+        /// Website를 추가하는 함수
+        /// </summary>
+        /// <param name="req.Label">
+        /// 이름을 지정
+        /// </param>
+        /// <param name="req.Website_URL">
+        /// 웹 주소
+        /// </param>
+        /// /// <param name="req.Mobile_URL">
+        /// 모바일 주소
+        /// </param>
+        /// <returns></returns>
+        public EnvelopeDTO<GenericDummyDTO> Any(WebsiteCreateRequestDTO req)
+        {
+            string Label = req.Label;
+            string Webstie_URL = req.Website_URL;
+            string Mobile_URL = req.Mobile_URL;
+
+            if (string.IsNullOrWhiteSpace(Label) && !string.IsNullOrWhiteSpace(Webstie_URL) && !string.IsNullOrWhiteSpace(Mobile_URL))
+            {
+                return Fail<GenericDummyDTO>("WebsiteCreateRequestDTO : parameter 'Label' is empty.");
+            }
+            if (!string.IsNullOrWhiteSpace(Label) && string.IsNullOrWhiteSpace(Webstie_URL) && !string.IsNullOrWhiteSpace(Mobile_URL))
+            {
+                return Fail<GenericDummyDTO>("WebsiteCreateRequestDTO : parameter 'Webstie_URL' is empty.");
+            }
+            if (!string.IsNullOrWhiteSpace(Label) && !string.IsNullOrWhiteSpace(Webstie_URL) && string.IsNullOrWhiteSpace(Mobile_URL))
+            {
+                return Fail<GenericDummyDTO>("WebsiteCreateRequestDTO : parameter 'Mobile_URL' is empty.");
+            }
+            if (string.IsNullOrWhiteSpace(Label) && string.IsNullOrWhiteSpace(Webstie_URL) && !string.IsNullOrWhiteSpace(Mobile_URL))
+            {
+                return Fail<GenericDummyDTO>("WebsiteCreateRequestDTO : parameter 'Label' && 'Webstie_URL' are empty.");
+            }
+            if (string.IsNullOrWhiteSpace(Label) && !string.IsNullOrWhiteSpace(Webstie_URL) && string.IsNullOrWhiteSpace(Mobile_URL))
+            {
+                return Fail<GenericDummyDTO>("WebsiteCreateRequestDTO : parameter 'Label' && 'Mobile_URL' are empty.");
+            }
+            if (!string.IsNullOrWhiteSpace(Label) && string.IsNullOrWhiteSpace(Webstie_URL) && string.IsNullOrWhiteSpace(Mobile_URL))
+            {
+                return Fail<GenericDummyDTO>("WebsiteCreateRequestDTO : parameter 'Webstie_URL' && 'Mobile_URL' are empty.");
+            }
+            if (string.IsNullOrWhiteSpace(Label) && string.IsNullOrWhiteSpace(Webstie_URL) && string.IsNullOrWhiteSpace(Mobile_URL))
+            {
+                return Fail<GenericDummyDTO>("WebsiteCreateRequestDTO : parameter 'Webstie_URL' && 'Scheduled' && 'Mobile_URL' are empty.");
+            }
+            else
+            {
+                using (var entities = new CrawlerStorage())
+                {
+                    try
+                    {
+                        var website = new Website();
+                        website.Label = Label;
+                        website.Website_URL = Webstie_URL;
+                        website.Mobile_URL = Mobile_URL;
+
+                        entities.Websites.Add(website);
+
+                        entities.SaveChanges();
+
+                        return Succeeded(new GenericDummyDTO());
+                    }
+                    catch (System.Data.Entity.Validation.DbEntityValidationException dbEx)
+                    {
+                        Exception raise = dbEx;
+                        foreach (var validationErrors in dbEx.EntityValidationErrors)
+                        {
+                            foreach (var validationError in validationErrors.ValidationErrors)
+                            {
+                                string message = string.Format("{0}:{1}",
+                                    validationErrors.Entry.Entity.ToString(),
+                                    validationError.ErrorMessage);
+                                raise = new InvalidOperationException(message, raise);
+                            }
+                        }
+                        throw raise;
+                    }
+                }
+            }
+        }
+    }
+}

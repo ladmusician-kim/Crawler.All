@@ -1,0 +1,154 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HtmlAgilityPack;
+using Crawler.Data.DbContext;
+using System.Text.RegularExpressions;
+using Crawler.DTO.ResponseDTO;
+
+namespace Sitecrawler.Core.Code
+{
+    public class bobaedreamCrawler : commonCrawler
+    {
+
+        public override void Run()
+        {
+            try
+            {
+                List<ContentDTO> contentList = new List<ContentDTO>();
+                List<int> snapTocontentList = new List<int>();
+
+                //commonCrawler로 부터 상속받은 부분
+                //보배드림
+
+                var bobaedream = webGetutf.Load("http://m.bobaedream.co.kr/board/new_writing/freeb");
+                System.Console.WriteLine("---------------------웹사이트 이름----------------");
+                System.Console.WriteLine("보배드림");
+                //var src_Count = 0;
+                //content_guid를 저장하는 List
+                
+                foreach (var bobaedream_ul in bobaedream.DocumentNode.SelectNodes("//ul[@class= 'list02']"))
+                {
+                    foreach (var bobaedream_li in bobaedream_ul.Descendants())
+                    {
+                        foreach (var bobaedream_a in bobaedream_li.Descendants())
+                        {
+                            ContentDTO content;
+
+                            if (bobaedream_a.Name == "a")
+                            {
+                                var timestring = bobaedream_a.Descendants().SingleOrDefault(p => p.GetAttributeValue("class", "dd") == "numEng").InnerText.Trim();
+                                var article = bobaedream_a.Descendants().SingleOrDefault(p => p.GetAttributeValue("class", "dd") == "text").InnerText.Trim();
+                                var time = DateTime.Parse(timestring);
+                                
+                                HtmlAttribute bobaedream_url = bobaedream_a.Attributes["href"];
+                                var url = ("http://m.bobaedream.co.kr" + bobaedream_url.Value);
+
+                                //안의 내용을 가져오는 함수 실행.
+                                var innerArticle = RunContent(url);
+
+                                var details = "";
+                                var details_html = "";
+                                List<SrcdataDTO> SrcDatas = new List<SrcdataDTO>();
+
+                                //안의 내용
+                                if (innerArticle.First() != "")
+                                {
+                                    //details 저장
+                                    details = innerArticle.First();
+                                }
+                                else
+                                {
+                                    details = "내용이 없습니다.";
+                                }
+                                //안의 내용의 html
+                                if (innerArticle[1] != "")
+                                {
+                                    //details_html 저장
+                                    details_html = innerArticle[1];
+                                    SrcDatas = ParseSrc(details_html); 
+                                }
+
+                                contentList.Add(new ContentDTO
+                                {
+                                    Crawled = time,
+                                    Contents_URL = url,
+                                    Article = article,
+                                    Details = details,
+                                    Details_Html = details_html,
+                                    SrcDatas = SrcDatas
+                                });
+                            }
+                        }
+                    }
+                }
+                SendSnapshot(contentList, 2);
+            }
+
+            catch (Exception e)
+            {
+
+            }
+        }
+        //content 내용, html 가져오는 함수
+        public List<string> RunContent(string url)
+        {
+            var ruiwebContents = webGetutf.Load(url);
+            //var content_count = 0;
+            List<string> details = new List<string>();
+            foreach (var content in ruiwebContents.DocumentNode.SelectNodes("//div[@id = 'body_frame']"))
+            {
+
+                foreach(var ct in content.Descendants())
+                {
+                    if(ct.Name == "style")
+                    {
+                        ct.InnerHtml = "";
+                    }
+                }
+
+                System.Console.WriteLine("------------------------------------------------------------------------");
+                System.Console.WriteLine("HTML 내용");
+                System.Console.WriteLine(content.InnerText.Trim());
+                System.Console.WriteLine("------------------------------------------------------------------------");
+                System.Console.WriteLine("HTML 태그");
+                System.Console.WriteLine(content.InnerHtml.Trim());
+                
+                details.Add(content.InnerText);
+                details.Add(content.InnerHtml);
+            }
+            return details;
+        }
+        //Icrawler로 부터 상속받은 부분
+        public override bool Login(string Username, string Password)
+        {
+            return true;
+        }
+
+        public override void UpdateRecentArticles(int boardid)
+        {
+        }
+
+        public override void Noop()
+        {
+
+        }
+
+        public override void ParseComment()
+        {
+
+        }
+
+        public override void ParseClickNum()
+        {
+
+        }
+
+        public override void ParseLikeNum()
+        {
+
+        }
+    }
+}

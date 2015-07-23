@@ -1,0 +1,36 @@
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\bin\Release\Crawler.Data.dll.config
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\bin\Release\Crawler.Data.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\bin\Release\Crawler.Data.pdb
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\bin\Release\EntityFramework.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\bin\Release\EntityFramework.SqlServer.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\bin\Release\EntityFramework.xml
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\bin\Release\EntityFramework.SqlServer.xml
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\bin\Release\ko\EntityFramework.resources.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\bin\Release\ko\EntityFramework.SqlServer.resources.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\obj\Release\Crawler.Data.csprojResolveAssemblyReference.cache
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\obj\Release\Crawler.Data.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\obj\Release\Crawler.Data.pdb
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\bin\Release\MySql.Data.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\bin\Release\MySql.Data.Entity.EF6.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\obj\Release\Crawler.Data.Migrations.Migrations.resources
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\obj\Release\Crawler.Data.csproj.GenerateResource.Cache
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\bin\Release\MoreLinq.Portable.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.Data\bin\Release\MoreLinq.Portable.xml
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.Data\bin\Release\Crawler.Data.dll.config
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.Data\bin\Release\Crawler.Data.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.Data\bin\Release\Crawler.Data.pdb
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.Data\bin\Release\EntityFramework.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.Data\bin\Release\EntityFramework.SqlServer.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.Data\bin\Release\MoreLinq.Portable.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.Data\bin\Release\MySql.Data.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.Data\bin\Release\MySql.Data.Entity.EF6.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.Data\bin\Release\EntityFramework.xml
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.Data\bin\Release\EntityFramework.SqlServer.xml
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.Data\bin\Release\MoreLinq.Portable.xml
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.Data\bin\Release\ko\EntityFramework.resources.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.Data\bin\Release\ko\EntityFramework.SqlServer.resources.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.Data\obj\Release\Crawler.Data.csprojResolveAssemblyReference.cache
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.Data\obj\Release\Crawler.Data.Migrations.Migrations.resources
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.Data\obj\Release\Crawler.Data.csproj.GenerateResource.Cache
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.Data\obj\Release\Crawler.Data.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.Data\obj\Release\Crawler.Data.pdb

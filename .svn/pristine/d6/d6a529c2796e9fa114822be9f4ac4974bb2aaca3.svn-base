@@ -1,0 +1,151 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HtmlAgilityPack;
+using Crawler.Data.DbContext;
+using System.Text.RegularExpressions;
+using Crawler.DTO.ResponseDTO;
+
+namespace Sitecrawler.Core.Code
+{
+    public class bobaedreamCrawler : commonCrawler
+    {
+
+        public override void getList(int count)
+        {
+            List<ContentDTO> contentList = new List<ContentDTO>();
+            List<int> snapTocontentList = new List<int>();
+
+            //commonCrawler로 부터 상속받은 부분
+            //보배드림
+
+            var bobaedream = webGetutf.Load("http://m.bobaedream.co.kr/board/new_writing/freeb");
+            System.Console.WriteLine("보배드림");
+            //var src_Count = 0;
+            //content_guid를 저장하는 List
+
+            var bobae_ul = bobaedream.DocumentNode.SelectNodes("//ul[@class= 'list02']").FirstOrDefault();
+            var articles = bobae_ul.Descendants("li");
+                
+            foreach(var boabe_li in articles)
+            {
+                var anchortag = boabe_li.ChildNodes.SingleOrDefault(c => c.Name.Equals("a"));
+                var titlenode = anchortag.SelectSingleNode("./em[@class='title3']");
+                //var authnode = anchortag.SelectSingleNode("./span[@class='auth']");
+
+                var url = anchortag.GetAttributeValue("href", "undefined");
+                var article = titlenode.InnerText.Trim();
+                
+
+                System.Console.WriteLine(article);
+                System.Console.WriteLine(url);
+
+                contentList.Add(new ContentDTO
+                {
+                    Crawled = DateTime.Now,
+                    Contents_URL = "http://m.bobaedream.co.kr" + anchortag.GetAttributeValue("href", "undefined"),
+                    Article = titlenode.InnerText.Trim(),
+                    Url_Params = anchortag.GetAttributeValue("href", "undefined")
+                });
+            }
+            SendSnapshot(contentList, 2);
+        }
+        public override void getDetails()
+        {
+
+        }
+        public override void getImages()
+        {
+
+        }
+        public override void Run()
+        {
+
+        }
+        //content 내용, html 가져오는 함수
+        public List<string> RunContent(string url)
+        {
+            var ruiwebContents = webGetutf.Load(url);
+            //var content_count = 0;
+            List<string> details = new List<string>();
+            foreach (var content in ruiwebContents.DocumentNode.SelectNodes("//div[@id = 'body_frame']"))
+            {
+
+                foreach(var ct in content.Descendants())
+                {
+                    if(ct.Name == "style")
+                    {
+                        ct.InnerHtml = "";
+                    }
+                }
+
+                System.Console.WriteLine("------------------------------------------------------------------------");
+                System.Console.WriteLine("HTML 내용");
+                System.Console.WriteLine(content.InnerText.Trim());
+                System.Console.WriteLine("------------------------------------------------------------------------");
+                System.Console.WriteLine("HTML 태그");
+                System.Console.WriteLine(content.InnerHtml.Trim());
+                
+                details.Add(content.InnerText);
+                details.Add(content.InnerHtml);
+            }
+            return details;
+        }
+        //Icrawler로 부터 상속받은 부분
+        public override bool Login(string Username, string Password)
+        {
+            return true;
+        }
+
+        public override void UpdateRecentArticles(int boardid)
+        {
+        }
+
+        public override void Noop()
+        {
+
+        }
+
+        public override void ParseComment()
+        {
+
+        }
+
+        public override void ParseClickNum()
+        {
+
+        }
+
+        public override void ParseLikeNum()
+        {
+
+        }
+
+        public override void StartCrawl()
+        {
+
+        }
+
+        public override void LoadImages()
+        {
+
+        }
+
+        public override void GetContents()
+        {
+
+        }
+
+        public override void DownloadImages()
+        {
+
+        }
+
+        public override void SendSnapshot()
+        {
+
+        }
+    }
+}

@@ -1,0 +1,22 @@
+namespace Crawler.Data.Migrations
+{
+    using System;
+    using System.Data.Entity.Migrations;
+    
+    public partial class Migrations : DbMigration
+    {
+        public override void Up()
+        {
+            AlterColumn("dbo.Srcdatas", "original_sourceurl", c => c.String());
+            AlterColumn("dbo.Srcdatas", "checksum", c => c.String());
+            AlterColumn("dbo.Srcdatas", "filename", c => c.String());
+        }
+        
+        public override void Down()
+        {
+            AlterColumn("dbo.Srcdatas", "filename", c => c.String(nullable: false));
+            AlterColumn("dbo.Srcdatas", "checksum", c => c.String(nullable: false));
+            AlterColumn("dbo.Srcdatas", "original_sourceurl", c => c.String(nullable: false));
+        }
+    }
+}

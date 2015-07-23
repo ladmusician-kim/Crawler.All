@@ -1,0 +1,97 @@
+﻿using Sitecrawler.Core.Interface;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HtmlAgilityPack;
+using Crawler.Data.DbContext;
+using System.Text.RegularExpressions;
+using Crawler.DTO.ResponseDTO;
+
+namespace Sitecrawler.Core.Code
+{
+    public class soccerlineCrawler : commonCrawler
+    {
+        private readonly int _perpage = 25;
+        protected override int perpage { get { return _perpage; } }
+
+        protected override List<ContentRevisionDTO> GetContentsPerPage(int page)
+        {
+            try
+            {
+                var contentrevisionList = new List<ContentRevisionDTO>();
+
+                //commonCrawler로 부터 상속받은 부분
+                //사커라인
+                var soccerline = webGetkr.Load("http://www.soccerline.co.kr/slboard/list.php?page=" + page + "&code=locker&keyfield=&key=&period=&");
+                System.Console.WriteLine("사커라인");
+
+                var soccerline_table = soccerline.DocumentNode.SelectNodes("//table[@class= 'te2']");
+                foreach (var tr in soccerline_table.Descendants().Where(p => p.GetAttributeValue("height", "dd") == "22"))
+                {
+                    var anchortag = tr.ChildNodes.SingleOrDefault(c => c.Name.Equals("a"));
+                    var article = anchortag.InnerText.Trim();
+
+                    var url = new Uri(new Uri("http://www.soccerline.co.kr/slboard "), anchortag.GetAttributeValue("href", "undefined"));
+
+                    contentrevisionList.Add(new ContentRevisionDTO
+                    {
+                        Crawled = DateTime.Now,
+                        For_BoardId = 6,
+                        isDepricate = false,
+                        Content = new ContentDTO
+                        {
+                            Article = article,
+                            Contents_URL = url.AbsoluteUri,
+                            Url_Params = url.PathAndQuery,
+                        }
+                    });
+                }
+                return contentrevisionList;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
+        protected override void ParseContent(ContentRevisionDTO contentrevision)
+        {
+            try
+            {
+                var ruiwebContents = webGetkr.Load(contentrevision.Content.Contents_URL);
+                //var content_count = 0;
+                List<string> details = new List<string>();
+                var content = ruiwebContents.DocumentNode.SelectNodes("//div[@id = 'DocContent']").SingleOrDefault();
+                contentrevision.Details = content.InnerText.Trim();
+                contentrevision.Details_Html = content.InnerHtml.Trim();
+                contentrevision.isDepricate = false;
+
+                var imgnodes = content.SelectNodes(".//img");
+
+                contentrevision.SrcDatas = new List<SrcdataDTO>();
+                if (imgnodes == null) return;
+
+                foreach (var img in imgnodes)
+                {
+                    var srcurl = new Uri(img.GetAttributeValue("src", "default"));
+                    var srcdata = new SrcdataDTO
+                    {
+                        SourceUrl = srcurl.AbsoluteUri,
+                        IsDepricated = false,
+                        FileName = System.IO.Path.GetFileName(srcurl.LocalPath),
+                        SrcGuId = Guid.NewGuid(),
+                    };
+                    img.SetAttributeValue("guid", srcdata.SrcGuId.ToString());
+
+                    contentrevision.SrcDatas.Add(srcdata);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("ReStart");
+                ParseContent(contentrevision);
+            }
+        }
+    }
+}

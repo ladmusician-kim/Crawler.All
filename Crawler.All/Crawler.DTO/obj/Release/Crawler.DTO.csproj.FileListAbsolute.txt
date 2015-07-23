@@ -1,0 +1,24 @@
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.DTO\bin\Release\Crawler.DTO.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.DTO\bin\Release\Crawler.DTO.pdb
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.DTO\bin\Release\Newtonsoft.Json.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.DTO\bin\Release\protobuf-net.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.DTO\bin\Release\Newtonsoft.Json.xml
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.DTO\bin\Release\protobuf-net.pdb
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.DTO\bin\Release\protobuf-net.xml
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.DTO\obj\Release\Crawler.DTO.csprojResolveAssemblyReference.cache
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.DTO\obj\Release\Crawler.DTO.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.DTO\obj\Release\Crawler.DTO.pdb
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.DTO\bin\Release\MoreLinq.Portable.dll
+C:\Users\Chori-ClasseStudio\Documents\Visual Studio 2013\Projects\Crawler.All\Crawler.All\Crawler.DTO\bin\Release\MoreLinq.Portable.xml
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.DTO\bin\Release\Crawler.DTO.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.DTO\bin\Release\Crawler.DTO.pdb
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.DTO\bin\Release\MoreLinq.Portable.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.DTO\bin\Release\Newtonsoft.Json.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.DTO\bin\Release\protobuf-net.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.DTO\bin\Release\MoreLinq.Portable.xml
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.DTO\bin\Release\Newtonsoft.Json.xml
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.DTO\bin\Release\protobuf-net.pdb
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.DTO\bin\Release\protobuf-net.xml
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.DTO\obj\Release\Crawler.DTO.csprojResolveAssemblyReference.cache
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.DTO\obj\Release\Crawler.DTO.dll
+C:\Users\dev_dj\Downloads\Crawler.All\Crawler.All\Crawler.DTO\obj\Release\Crawler.DTO.pdb

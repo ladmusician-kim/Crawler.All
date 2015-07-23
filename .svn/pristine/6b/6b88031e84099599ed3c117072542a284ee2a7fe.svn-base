@@ -1,0 +1,168 @@
+namespace Crawler.Data.Migrations
+{
+    using System;
+    using System.Data.Entity.Migrations;
+    
+    public partial class Migrations : DbMigration
+    {
+        public override void Up()
+        {
+            CreateTable(
+                "dbo.Boards",
+                c => new
+                    {
+                        _boardid = c.Int(nullable: false),
+                        for_websiteid = c.Int(nullable: false),
+                        label = c.String(nullable: false, maxLength: 50, storeType: "nvarchar"),
+                    })
+                .PrimaryKey(t => t._boardid)
+                .ForeignKey("dbo.Websites", t => t.for_websiteid, cascadeDelete: true)
+                .Index(t => t.for_websiteid);
+            
+            CreateTable(
+                "dbo.Snapshots",
+                c => new
+                    {
+                        _snapshotid = c.Int(nullable: false, identity: true),
+                        for_boardid = c.Int(nullable: false),
+                        for_timeperiodid = c.Int(nullable: false),
+                        taken = c.DateTime(nullable: false, precision: 0),
+                    })
+                .PrimaryKey(t => t._snapshotid)
+                .ForeignKey("dbo.Boards", t => t.for_boardid, cascadeDelete: true)
+                .ForeignKey("dbo.TimePeriods", t => t.for_timeperiodid, cascadeDelete: true)
+                .Index(t => t.for_boardid)
+                .Index(t => t.for_timeperiodid);
+            
+            CreateTable(
+                "dbo.SnapshotToContentRevisions",
+                c => new
+                    {
+                        _snapshottocontentrevisionid = c.Int(nullable: false, identity: true),
+                        for_snapshotid = c.Int(nullable: false),
+                        seqno = c.Int(nullable: false),
+                        has_contentrevisionid = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t._snapshottocontentrevisionid)
+                .ForeignKey("dbo.ContentRevisions", t => t.has_contentrevisionid, cascadeDelete: true)
+                .ForeignKey("dbo.Snapshots", t => t.for_snapshotid, cascadeDelete: true)
+                .Index(t => t.for_snapshotid)
+                .Index(t => t.has_contentrevisionid);
+            
+            CreateTable(
+                "dbo.ContentRevisions",
+                c => new
+                    {
+                        _contentrevisionid = c.Int(nullable: false, identity: true),
+                        crawled = c.DateTime(nullable: false, precision: 0),
+                        checksum = c.String(maxLength: 24, storeType: "nvarchar"),
+                        details = c.String(unicode: false),
+                        details_html = c.String(unicode: false),
+                        recommend_count = c.Int(nullable: false),
+                        view_count = c.Int(nullable: false),
+                        is_depricate = c.Boolean(nullable: false),
+                        for_contentid = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t._contentrevisionid)
+                .ForeignKey("dbo.Contents", t => t.for_contentid, cascadeDelete: true)
+                .Index(t => t.for_contentid);
+            
+            CreateTable(
+                "dbo.Contents",
+                c => new
+                    {
+                        _contentid = c.Int(nullable: false, identity: true),
+                        contentguid = c.Guid(nullable: false),
+                        url_params = c.String(unicode: false),
+                        contents_url = c.String(nullable: false, unicode: false),
+                        checksum = c.String(unicode: false),
+                        article = c.String(nullable: false, unicode: false),
+                    })
+                .PrimaryKey(t => t._contentid);
+            
+            CreateTable(
+                "dbo.Srcdatas",
+                c => new
+                    {
+                        _srcdataid = c.Int(nullable: false, identity: true),
+                        srcguid = c.Guid(nullable: false),
+                        for_contentid = c.Int(nullable: false),
+                        original_sourceurl = c.String(maxLength: 250, unicode: false),
+                        private_sourceurl = c.String(maxLength: 250, unicode: false),
+                        originalpayload_size = c.Long(nullable: false),
+                        processedpayload_size = c.Long(),
+                        checksum = c.String(maxLength: 24, storeType: "nvarchar"),
+                        filename = c.String(maxLength: 250, unicode: false),
+                        originalpayload = c.Binary(),
+                        processedpayload = c.Binary(),
+                        is_depricate = c.Boolean(nullable: false),
+                    })
+                .PrimaryKey(t => t._srcdataid)
+                .ForeignKey("dbo.Contents", t => t.for_contentid, cascadeDelete: true)
+                .Index(t => t.for_contentid);
+            
+            CreateTable(
+                "dbo.TimePeriods",
+                c => new
+                    {
+                        _timeperiodid = c.Int(nullable: false, identity: true),
+                        shortguid = c.Guid(nullable: false),
+                        label = c.String(unicode: false),
+                        scheduled = c.DateTime(nullable: false, precision: 0),
+                        crawled = c.DateTime(nullable: false, precision: 0),
+                    })
+                .PrimaryKey(t => t._timeperiodid);
+            
+            CreateTable(
+                "dbo.Websites",
+                c => new
+                    {
+                        _websiteid = c.Int(nullable: false),
+                        label = c.String(nullable: false, maxLength: 50, storeType: "nvarchar"),
+                        website_url = c.String(nullable: false, unicode: false),
+                        mobile_url = c.String(nullable: false, unicode: false),
+                    })
+                .PrimaryKey(t => t._websiteid);
+            
+            CreateTable(
+                "dbo.ErrorLogs",
+                c => new
+                    {
+                        _errorlogid = c.Int(nullable: false),
+                        error_address = c.String(unicode: false),
+                        error_url = c.String(unicode: false),
+                        error_details = c.String(unicode: false),
+                        hresult = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t._errorlogid);
+            
+        }
+        
+        public override void Down()
+        {
+            DropForeignKey("dbo.Boards", "for_websiteid", "dbo.Websites");
+            DropForeignKey("dbo.Snapshots", "for_timeperiodid", "dbo.TimePeriods");
+            DropForeignKey("dbo.SnapshotToContentRevisions", "for_snapshotid", "dbo.Snapshots");
+            DropForeignKey("dbo.SnapshotToContentRevisions", "has_contentrevisionid", "dbo.ContentRevisions");
+            DropForeignKey("dbo.Srcdatas", "for_contentid", "dbo.Contents");
+            DropForeignKey("dbo.ContentRevisions", "for_contentid", "dbo.Contents");
+            DropForeignKey("dbo.Snapshots", "for_boardid", "dbo.Boards");
+            DropIndex("dbo.Srcdatas", new[] { "for_contentid" });
+            DropIndex("dbo.ContentRevisions", new[] { "for_contentid" });
+            DropIndex("dbo.SnapshotToContentRevisions", new[] { "has_contentrevisionid" });
+            DropIndex("dbo.SnapshotToContentRevisions", new[] { "for_snapshotid" });
+            DropIndex("dbo.Snapshots", new[] { "for_timeperiodid" });
+            DropIndex("dbo.Snapshots", new[] { "for_boardid" });
+            DropIndex("dbo.Boards", new[] { "for_websiteid" });
+            DropTable("dbo.ErrorLogs");
+            DropTable("dbo.Websites");
+            DropTable("dbo.TimePeriods");
+            DropTable("dbo.Srcdatas");
+            DropTable("dbo.Contents");
+            DropTable("dbo.ContentRevisions");
+            DropTable("dbo.SnapshotToContentRevisions");
+            DropTable("dbo.Snapshots");
+            DropTable("dbo.Boards");
+        }
+    }
+}

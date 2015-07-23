@@ -1,0 +1,70 @@
+﻿using Crawler.Data.DbContext;
+using Crawler.DTO.RequestDTO;
+using Crawler.DTO.ResponseDTO;
+using ServiceStack.ServiceClient.Web;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Crawler.API.ServiceCode
+{
+    public partial class CrawlerService : ServiceBase
+    {
+        public EnvelopeDTO<List<SrcdataDTO>> Any(SrcdataGetbycontentIdRequestDTO req)
+        {
+            var For_ContentId = req.For_ContentId;
+
+            if (For_ContentId == null)
+            {
+                return Fail<List<SrcdataDTO>>("SrcdataGetbyIdRequestDTO : parameter 'For_ContentId' is empty.");
+            }
+
+            using (var entities = new CrawlerStorage())
+            {
+                try
+                {           
+                    var srcdata = (from s in entities.Srcdatas
+                                   where s.For_ContentId == For_ContentId
+                                   select new SrcdataDTO
+                                   {
+                                       Id = s.Id,
+                                       SrcGuId = s.SrcGuId,
+                                       Src = s.Src,
+                                       For_ContentId = s.For_ContentId
+                                   }).ToList();
+
+                    if (srcdata == null)
+                    {
+                        return Fail<List<SrcdataDTO>>("SrcdataGetbyIdRequestDTO : Src matching given 'For_ContentId' does not exist.");
+                    }
+                    return Succeeded(srcdata);
+                }
+
+                catch (Exception e)
+                {
+                    return Fail<List<SrcdataDTO>>("SrcdataGetbyIdRequestDTO : Exception - " + e.Message);
+                }
+            }
+        }
+
+        public EnvelopeDTO<GenericDummyDTO> Any(SrcdataCreateRequestDTO req)
+        {
+            var For_ContentId = req.For_ContentId;
+            var Src = req.Src;
+
+            using (var entities = new CrawlerStorage())
+            {
+                var srcdata = new Srcdata();
+                srcdata.Src = Src;
+                srcdata.For_ContentId= For_ContentId;
+
+                entities.Srcdatas.Add(srcdata);
+
+                entities.SaveChanges();
+
+                return Succeeded(new GenericDummyDTO());
+            }
+        }
+    }
+}

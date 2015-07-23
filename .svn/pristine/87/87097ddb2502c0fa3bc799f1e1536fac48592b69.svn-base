@@ -1,0 +1,69 @@
+﻿using Crawler.Data.DbContext;
+using Crawler.DTO.RequestDTO;
+using Crawler.DTO.ResponseDTO;
+using ServiceStack.ServiceClient.Web;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Crawler.API.ServiceCode
+{
+    public partial class CrawlerService : ServiceBase
+    {
+        public EnvelopeDTO<SnapshotDTO> Any(SnapshotGetSnapshotRequestDTO req)
+        {
+            var snapshotId = req.SnapshotId;
+
+            var snapshot = (from s in context.Snapshots
+                            where s.Id == snapshotId
+                            select new SnapshotDTO
+                            {
+                                Id = s.Id,
+                                Taken = s.Taken,
+                                For_Timeperiod = new TimePeriodDTO
+                                {
+
+                                },
+                                For_WebsiteId = new WebsiteDTO
+                                {
+
+                                },
+                            }).ToList();
+
+
+
+            return null;
+        }
+
+
+        public EnvelopeDTO<SnapshotDTO> Any(SnapshotCreateRequestDTO req)
+        {
+            var taken = req.Taken;
+            var For_WebsiteId = req.For_WebsiteId;
+            var For_Timeperiod = req.For_TimeperiodId;
+
+            using (var entities = new CrawlerStorage())
+            {
+                try
+                {
+                    var snapshot = new Snapshot();
+
+                    snapshot.For_Timeperiod = For_Timeperiod;
+                    snapshot.For_WebsiteId = For_WebsiteId;
+                    snapshot.Taken = taken;
+
+                    entities.Snapshots.Add(snapshot);
+
+                    entities.SaveChanges();
+
+                    return Succeeded(new SnapshotDTO { Taken = snapshot.Taken, Id = snapshot.Id, For_WebsiteId = snapshot.For_WebsiteId, For_Timeperiod = snapshot.For_WebsiteId });
+                }
+                catch (Exception e)
+                {
+                    return Fail<SnapshotDTO>("SnapshotCreateRequestDTO : Exception - " + e.Message);
+                }
+            }
+        }
+    }
+}

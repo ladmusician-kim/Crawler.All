@@ -1,0 +1,313 @@
+﻿using AutoMapper;
+using Crawler.Data.DbContext;
+using Crawler.DTO.RequestDTO;
+using Crawler.DTO.ResponseDTO;
+using ServiceStack.ServiceClient.Web;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Crawler.API.ServiceCode
+{
+    public partial class CrawlerService : ServiceBase
+    {
+        /// <summary>
+        /// SnapshotDTO를 SnapshotId를 통해서 가져오는 함수
+        /// </summary>
+        /// <param name="req">
+        /// SnapshotId
+        /// </param>
+        /// <returns>
+        /// SnapshotDTO
+        /// </returns>
+        public EnvelopeDTO<SnapshotDTO> Any(SnapshotGetbyIdRequestDTO req)
+        {
+            var snapshotId = req.SnapshotId;
+                
+            if(!snapshotId.HasValue)
+            {
+                return Fail<SnapshotDTO>("SnapshotGetbyIdRequestDTO : parameter 'snapshotId' is empty.");
+            }
+                
+            else
+            {
+                using (var entities = new CrawlerStorage())
+                {
+                    try
+                    {
+                        var snapshot = (from s in entities.Snapshots.AsNoTracking()
+                                        where s.Id == snapshotId
+                                        select new SnapshotDTO
+                                        {
+                                            Id = s.Id,
+                                            For_BoardId = s.For_BoardId,
+                                            For_Timeperiod = s.For_Timeperiod,
+                                            Taken = s.Taken,
+                                            TimePeriod = new TimePeriodDTO
+                                            {
+                                                Id = s.TimePeriod.Id,
+                                                Label = s.TimePeriod.Label,
+                                                Crawled = s.TimePeriod.Crawled,
+                                                Scheduled = s.TimePeriod.Scheduled
+                                            },
+                                            Board = new BoardDTO
+                                            {
+                                                Id = s.Board.Id,
+                                                Label = s.Board.Label,
+                                                For_WebsiteId = s.Board.For_WebsiteId
+                                            },
+                                            Contents = (from c in s.SnapshotToContent
+                                                        let con = c.Content
+                                                        select new ContentDTO
+                                                        {
+                                                            Id = con.Id,
+                                                            ContentGuId = con.ContentGuId,
+                                                            Article = con.Article,
+                                                            Contents_URL = con.Contents_URL,
+                                                            Crawled = con.Crawled,
+                                                            Details = con.Details,
+                                                            Details_Html = con.Details_Html,
+                                                            isDepricate = con.IsDepricated,
+                                                            SrcDatas = (from src in con.Srcdatas
+                                                                        select new SrcdataDTO
+                                                                        {
+                                                                            Id = src.Id,
+                                                                            SrcGuId = src.SrcGuId,
+                                                                            For_ContentId = src.For_ContentId,
+                                                                            SourceUrl = src.SourceUrl,
+                                                                            FileName = src.FileName,
+                                                                        }).ToList()
+                                                        }).ToList(),
+                                        }).SingleOrDefault();
+                        var dto = Mapper.DynamicMap<SnapshotDTO>(snapshot);
+
+                        return Succeeded(dto);
+                    }
+
+                    catch (Exception e)
+                    {
+                        return Fail<SnapshotDTO>("SnapshotGetbyIdRequestDTO : Exception --->" + e);
+                    }
+                }
+            }
+        }
+
+        public EnvelopeDTO<SnapshotDTO> Any(SnapshotSaveRequestDTO req)
+        {
+            var timeslot = req.TimeSlot;
+
+            
+
+            return null;
+        }
+
+
+        /// <summary>
+        /// SnapshotDTO를 for_boardid를 통해서 가져오는 함수
+        /// </summary>
+        /// <param name="req">
+        /// for_boardid
+        /// </param>
+        /// <returns>
+        /// SnapshotDTO
+        /// </returns>
+        public EnvelopeDTO<List<SnapshotDTO>> Any(SnapshotGetbyBoardIdRequestDTO req)
+        {
+            var for_boardid = req.For_BoardId;
+
+            if (!for_boardid.HasValue)
+            {
+                return Fail<List<SnapshotDTO>>("SnapshotGetbyIdRequestDTO : parameter 'for_boardid' is empty.");
+            }
+
+            else
+            {
+                using (var entities = new CrawlerStorage())
+                {
+                    try
+                    {
+                        var snapshots = (from s in entities.Snapshots.AsNoTracking()
+                                        where s.For_BoardId == for_boardid
+                                        select new SnapshotDTO
+                                        {
+                                            Id = s.Id,
+                                            For_BoardId = s.For_BoardId,
+                                            For_Timeperiod = s.For_Timeperiod,
+                                            Taken = s.Taken,
+                                            TimePeriod = new TimePeriodDTO
+                                            {
+                                                Id = s.TimePeriod.Id,
+                                                Label = s.TimePeriod.Label,
+                                                Crawled = s.TimePeriod.Crawled,
+                                                Scheduled = s.TimePeriod.Scheduled
+                                            },
+                                            Board = new BoardDTO
+                                            {
+                                                Id = s.Board.Id,
+                                                Label = s.Board.Label,
+                                                For_WebsiteId = s.Board.For_WebsiteId
+                                            },
+                                            Contents = (from c in s.SnapshotToContent
+                                                        let con = c.Content
+                                                        select new ContentDTO
+                                                        {
+                                                            Id = con.Id,
+                                                            ContentGuId = con.ContentGuId,
+                                                            Article = con.Article,
+                                                            Contents_URL = con.Contents_URL,
+                                                            Crawled = con.Crawled,
+                                                            Details = con.Details,
+                                                            Details_Html = con.Details_Html,
+                                                            SrcDatas = (from src in con.Srcdatas
+                                                                        select new SrcdataDTO
+                                                                        {
+                                                                            Id = src.Id,
+                                                                            SrcGuId = src.SrcGuId,
+                                                                            For_ContentId = src.For_ContentId,
+                                                                            SourceUrl = src.SourceUrl
+                                                                        }).ToList()
+                                                        }).ToList(),
+                                        }).ToList();
+                        var dto = Mapper.DynamicMap<List<SnapshotDTO>>(snapshots);
+
+                        return Succeeded(dto);
+                    }
+
+                    catch (Exception e)
+                    {
+                        return Fail<List<SnapshotDTO>>("SnapshotGetbyIdRequestDTO : Exception --->" + e);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Snapshot을 SnapshotDTO를 통해서 Create 하는 함수
+        /// </summary>
+        /// <param name="req">
+        /// SnapshotDTO
+        /// </param>
+        /// <returns></returns>
+        public EnvelopeDTO<SnapshotDTO> Any(SnapshotCreateRequestDTO req)
+        {
+            var Snapshot = req.Snapshot;
+            using (var entities = new CrawlerStorage())
+            {
+                try
+                {
+                    var snapshot = new Snapshot();
+
+                    snapshot.For_Timeperiod = Snapshot.For_Timeperiod;
+                    snapshot.Taken = Snapshot.Taken;
+                    snapshot.For_BoardId = Snapshot.For_BoardId;
+                    
+                    entities.Snapshots.Add(snapshot);
+
+                    int contentseq = 0;
+
+                    foreach (var snapshotscontent in Snapshot.Contents)
+                    {
+                        var content = new Content();
+                        content.Contents_URL = snapshotscontent.Contents_URL;
+                        content.Article = snapshotscontent.Article;
+                        content.Crawled = snapshotscontent.Crawled;
+                        content.Url_Params = snapshotscontent.Url_Params;
+                        content.ContentGuId = Guid.NewGuid();
+                        content.IsDepricated = snapshotscontent.isDepricate;
+
+                        contentseq++;
+
+                        entities.Contents.Add(content);
+
+                        //foreach (var data in snapshotscontent.SrcDatas)
+                        //{
+                        //    var srcdata = new Srcdata();
+
+                        //    srcdata.SrcGuId = Guid.NewGuid();
+                        //    srcdata.Src = data.Src;
+                        //    srcdata.Content = content;
+
+                        //    entities.Srcdatas.Add(srcdata);
+                        //}
+
+                        var snapshotTocontent = new SnapshotToContent();
+                        snapshotTocontent.Content = content;
+                        snapshotTocontent.Snapshot = snapshot;
+                        snapshotTocontent.Seqno = contentseq;
+                        entities.SnapshotToContents.Add(snapshotTocontent);
+                    }
+                    entities.SaveChanges();
+                    return Succeeded(new SnapshotDTO());
+                }
+
+                catch (System.Data.Entity.Validation.DbEntityValidationException dbEx)
+                {
+                    Exception raise = dbEx;
+                    foreach (var validationErrors in dbEx.EntityValidationErrors)
+                    {
+                        foreach (var validationError in validationErrors.ValidationErrors)
+                        {
+                            string message = string.Format("{0}:{1}",
+                                validationErrors.Entry.Entity.ToString(),
+                                validationError.ErrorMessage);
+                            raise = new InvalidOperationException(message, raise);
+                        }
+                    }
+                    throw raise;
+                }
+            }
+        }
+
+        public EnvelopeDTO<SnapshotDTO> Any(SnapshotUpdateRequestDTO req)
+        {
+            var Snapshot = req.Snapshot;
+            using (var entities = new CrawlerStorage())
+            {
+                try
+                {
+                    var snapshots = entities.Snapshots.SingleOrDefault(p => p.Id == Snapshot.Id);
+
+                    foreach (var content in snapshots.SnapshotToContent)
+                    {
+                        foreach (var Scontent in Snapshot.Contents)
+                        {
+                            if (content.Content.Id == Scontent.Id)
+                            {
+                                if (Scontent.Details != null && Scontent.Details_Html != null)
+                                {
+                                    content.Content.Details = Scontent.Details;
+                                    content.Content.Details_Html = Scontent.Details_Html;
+                                    content.Content.IsDepricated = Scontent.isDepricate;
+                                }
+                                //else
+                                //{
+                                //    content.Content.Details = "데이터 없음";
+                                //    content.Content.Details_Html = "데이터 없음";
+                                //}
+                            }
+                        }
+                    }
+                    entities.SaveChanges();
+                    return Succeeded(new SnapshotDTO());
+                }
+
+                catch (System.Data.Entity.Validation.DbEntityValidationException dbEx)
+                {
+                    Exception raise = dbEx;
+                    foreach (var validationErrors in dbEx.EntityValidationErrors)
+                    {
+                        foreach (var validationError in validationErrors.ValidationErrors)
+                        {
+                            string message = string.Format("{0}:{1}",
+                                validationErrors.Entry.Entity.ToString(),
+                                validationError.ErrorMessage);
+                            raise = new InvalidOperationException(message, raise);
+                        }
+                    }
+                    throw raise;
+                }
+            }
+        }
+    }
+}
